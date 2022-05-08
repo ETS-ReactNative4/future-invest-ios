@@ -26,6 +26,13 @@ import storage from '@react-native-firebase/storage';
 
 import FormInputWithDuplCheck from  '../components/FormInputWithDuplCheck';
 import { windowWidth } from '../utils/Dimentions';
+
+import DeviceInfo from 'react-native-device-info'; 
+
+import * as BaseApi from "../api/BaseApi";
+import * as FutureInvestApi from "../api/FutureInvestApi";
+
+
 const EditProfileScreen = () => {
   const {user, logout} = useContext(AuthContext);
   const [image, setImage] = useState(null);

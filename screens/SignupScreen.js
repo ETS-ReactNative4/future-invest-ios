@@ -242,7 +242,8 @@ const SignupScreen = ({navigation}) => {
     formData1.append("phone", sendObject.phone);
     formData1.append("macAddress", sendObject.macAddress);
     const req = {
-      data : sendObject
+      data : sendObject, 
+      header: { 'Authorization': "Basic YWxiYW5vdGVfaWRfYmxhYzphbGJhbm90ZV9wd2RfMjAxMw==", }
     }
 
     FutureInvestApi.signup(req)

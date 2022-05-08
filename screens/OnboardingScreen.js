@@ -1,8 +1,6 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
-
 import Onboarding from 'react-native-onboarding-swiper';
-
 const Dots = ({selected}) => {
     let backgroundColor;
 

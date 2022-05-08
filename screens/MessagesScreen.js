@@ -17,6 +17,10 @@ import {
 } from '../styles/MessageStyles';
 import { windowHeight, windowWidth } from '../utils/Dimentions';
 
+import DeviceInfo from 'react-native-device-info'; 
+import * as BaseApi from "../api/BaseApi";
+import * as FutureInvestApi from "../api/FutureInvestApi";
+import {AuthContext} from '../navigation/AuthProvider';
 
 const Messages = [
   {
@@ -84,8 +88,6 @@ const HeaderViewLabel= styled.Text`
 
   font-size: 20px;
   font-weight: 700;
-  
-
 
 `;
 
@@ -103,6 +105,136 @@ color : #cccccc;
 
 const MessagesScreen = ({navigation}) => {
   const [mode, setMode] = useState(0);
+  const [arrayPageItems, setArrayPageItems] = useState([]);
+  const {user, setUser, login, googleLogin, fbLogin} = useContext(AuthContext);
+
+  useEffect(()=> {
+    __apiGetChattingRooms();
+  },[])
+
+
+  function __apiPOST1(param1) {
+    // if (param1 == null || param1 === undefined || typeof param1 === "undefined" || param1 == "") {
+    //     return;
+    // }
+
+    DeviceInfo.getMacAddress().then((mac) => {
+      // "E5:12:D8:E5:69:97"
+      console.log(mac);
+
+
+    var sendObject = {
+      id : id,
+    }
+    var formData1 = new FormData()
+    formData1.append("id", sendObject.id);
+    const req = {
+      data : sendObject
+    }
+
+    FutureInvestApi.signup(req)
+    .then(res => {
+      console.log("FutureInvestApi.signup")
+      console.log(res)
+      if (res.status < 300) {
+        
+      }
+      return 
+    })
+    .catch(e=>{
+      // console.log('[CATCH]');
+      console.log(e && e.response);
+      alert("에러가 발생했습니다.")
+
+    })
+
+    })
+    ;
+    
+
+}
+
+
+function __apiCheckValidDevice() {
+  //checkOverlapNickname
+
+  DeviceInfo.getMacAddress().then((mac) => {
+    // "E5:12:D8:E5:69:97"
+    console.log(mac);
+
+    const req = {
+      query : `?memberUUID=${user.uuid}&macAddress=${mac}` 
+    }
+    FutureInvestApi.checkValidDevice(req)
+    .then(res => {
+      console.log("FutureInvestApi.__apiCheckOverlapNickname(req)");
+      if (res.status < 300) {
+      }
+    })
+    .catch(e=>{
+        // console.log('[CATCH]');
+  
+    })
+  });
+}
+
+function __apiGetIsConfirm() {
+  //checkOverlapNickname
+  const req = {
+    query : `?memberUUID=${user.uuid}` 
+  }
+  FutureInvestApi.getIsConfirm(req)
+  .then(res => {
+    console.log("FutureInvestApi.__apiCheckOverlapNickname(req)");
+    if (res.status < 300) {
+    }
+  })
+  .catch(e=>{
+      // console.log('[CATCH]');
+
+  })
+}
+
+function __apiGetCheckOverlapId() {
+  //checkOverlapNickname
+  const req = {
+    query : `?id=` ,
+    header: { 'Authorization': "Basic ZnV0dXJlaW52ZXN0OmZ1dHVyZXBhc3N3b3Jk", } 
+  }
+  FutureInvestApi.getIsConfirm(req)
+  .then(res => {
+    console.log("FutureInvestApi.__apiCheckOverlapNickname(req)");
+    if (res.status < 300) {
+    }
+  })
+  .catch(e=>{
+      // console.log('[CATCH]');
+
+  })
+}
+
+function __apiGetChattingRooms() {
+    console.log("__apiGetChattingRooms - 0")
+    const req = {
+      query: `?memberUUID=${user.uuid}`,
+      header: { 'Authorization': `Bearer ${user.memberTokenInfo.accessToken}`, }
+    }
+    FutureInvestApi.getChattingRooms(req)
+    .then(res => {
+      // console.log("__apiGetChattingRooms - 1")
+      // console.log(res)
+      if (res.status < 300) {
+        console.log("__apiGetChattingRooms - 2")
+        console.log(res.data)
+        
+        setArrayPageItems(res.data);
+      }
+    })
+    .catch(e=>{
+        // console.log('[CATCH]');
+
+    })
+  }
 
 
     return (
@@ -114,28 +246,38 @@ const MessagesScreen = ({navigation}) => {
         </HeaderView>
         {/* EMPTY VIEW */}
         {
-          mode == 0 &&
+          arrayPageItems &&
+          arrayPageItems.length == 0 &&
           <>
           
-          <Image style={{ width: 24, height: 24, marginBottom: 12,marginTop: 100 }} source={require('../assets/icon_chat0.png')} />
+          <Image 
+            style={{ width: 24, height: 24, marginBottom: 12,marginTop: 100 }} 
+            source={require('../assets/icon_chat0.png')} />
           <TouchableOpacity 
             onPress={()=> {
               setMode(1);
             }}>
-            <EmptyLabel
-            >현재 개설된 채팅방이 없습니다.</EmptyLabel>
+            <EmptyLabel>
+              현재 개설된 채팅방이 없습니다.
+            </EmptyLabel>
 
             </TouchableOpacity>
           </>
 
         }
         {
-          mode == 1 &&
+          arrayPageItems &&
+          arrayPageItems.length > 0 &&
           <>
           {/* LIST VIEW */}
           <FlatList 
           style={{ height:  windowHeight - 56 }}
-            data={Messages}
+            data={
+              // DEV
+              //Messages
+              // PROD
+              arrayPageItems
+            }
             keyExtractor={item=>item.id}
             renderItem={({item}) => (
               <Card onPress={() => navigation.navigate('Chat', {userName: item.userName})}>
@@ -157,7 +299,6 @@ const MessagesScreen = ({navigation}) => {
                       {/* {item.messageText} */}
                       마지막 메시지가 표시됩니다. 마지막 ...
                       </MessageText>
-
                   </TextSection>
                   <TextNumber>
                     11

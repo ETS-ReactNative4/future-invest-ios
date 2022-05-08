@@ -10,34 +10,17 @@ import { getStatusBarHeight } from "react-native-status-bar-height";
 import { getBottomSpace } from "react-native-iphone-x-helper";
 import { FlatList } from 'react-native-gesture-handler';
 
+import DeviceInfo from 'react-native-device-info'; 
+
+import * as BaseApi from "../api/BaseApi";
+import * as FutureInvestApi from "../api/FutureInvestApi";
+
+
+
 const safeAreaHeight= Dimensions.get("window").height - getStatusBarHeight() - getBottomSpace();
 
 
-// https://yannichoongs.tistory.com/192
-// yannichoongs.tistory.com/195
-// https://velog.io/@mementomori/React-Native-Chatting-구현
-// https://blog.logrocket.com/build-chat-app-react-native-gifted-chat/
-// https://stackoverflow.com/questions/61483269/highlight-the-search-text-in-flatlist-react-native
-// https://medium.com/@decentpianist/react-native-chat-with-image-and-audio-c09054ca2204
-
-// OBJECT SAMPLE
-// export interface IMessage {
-//   _id: string | number
-//   text: string
-//   createdAt: Date | number
-//   user: User
-//   image?: string
-//   video?: string
-//   audio?: string
-//   system?: boolean
-//   sent?: boolean
-//   received?: boolean
-//   pending?: boolean
-//   quickReplies?: QuickReplies
-// }
-
 const ChatScreen = () => {
-
   const {user, setUser, objectStore, setObjectStore} = useContext(AuthContext);
   const [messages, setMessages] = useState([]);
   const [boolOpenSidebar, setBoolOpenSidebar] = useState(false);
@@ -67,6 +50,164 @@ const ChatScreen = () => {
     }
 
   },[boolOpenToast]);
+
+
+
+  function __apiGetChattingRooms(param1) {
+    console.log("__apiGetChattingRooms - 0")
+    const req = {
+      query: `?chattingRoomId=${param1}&memberUUID=${user.uuid}`,
+      header: { 'Authorization': `Bearer ${user.memberTokenInfo.accessToken}`, }
+    }
+    FutureInvestApi.getChattingRoomInitData(req)
+    .then(res => {
+      // console.log("__apiGetChattingRooms - 1")
+      // console.log(res)
+      if (res.status < 300) {
+      }
+    })
+    .catch(e=>{
+        // console.log('[CATCH]');
+
+    })
+  }
+  function __apiGetChattingMessages(param1) {
+    console.log("__apiGetChattingRooms - 0")
+    const req = {
+      query: `?chattingRoomId=${param1}&memberUUID=${user.uuid}`,
+      header: { 'Authorization': `Bearer ${user.memberTokenInfo.accessToken}`, }
+    }
+    FutureInvestApi.getChattingMessages(req)
+    .then(res => {
+      // console.log("__apiGetChattingRooms - 1")
+      // console.log(res)
+      if (res.status < 300) {
+      }
+    })
+    .catch(e=>{
+        // console.log('[CATCH]');
+
+    })
+  }
+
+
+function __apiPutUpdateChattingRoomNotification(param1) {
+  console.log("__apiPutUpdateChattingRoomNotification - 0")
+  
+  // @Body body: ChattingRoomNotificationResponseDTO,
+  
+  // val chattingRoomId: Long,
+  // val memberUUID:String,
+  // val isReceive: Boolean
+  // @Header("Authorization") authorization: String
+  const req = {
+    query: `?chattingRoomId=${param1}&memberUUID=${user.uuid}`,
+    header: { 'Authorization': `Bearer ${user.memberTokenInfo.accessToken}`, }
+  }
+  FutureInvestApi.putChangeAlarmStatus(req)
+  .then(res => {
+    // console.log("__apiGetChattingRooms - 1")
+    // console.log(res)
+    if (res.status < 300) {
+    }
+  })
+  .catch(e=>{
+      // console.log('[CATCH]');
+
+  })
+}
+
+
+
+  function __apiGetChattingMessagesByKeyword(param1,param2, lastMessageCreatedDate) {
+    console.log("__apiGetChattingRooms - 0")
+    const req = {
+      query: `?chattingRoomId=${param1}&keyword=${param2}&lastMessageCreatedDate=${lastMessageCreatedDate}&memberUUID=${user.uuid}`,
+      header: { 'Authorization': `Bearer ${user.memberTokenInfo.accessToken}`, }
+    }
+    FutureInvestApi.getChattingMessagesByKeyword(req)
+    .then(res => {
+      // console.log("__apiGetChattingRooms - 1")
+      // console.log(res)
+      if (res.status < 300) {
+      }
+    })
+    .catch(e=>{
+        // console.log('[CATCH]');
+
+    })
+  }
+
+
+  function __apiPOSTReportMessage(param1,param2, lastMessageCreatedDate) {
+    console.log("__apiGetChattingRooms - 0")
+    const req = {
+      // @Body dto: ReportMessageRequestDTO,
+
+      // val memberUUID: String,
+      // val messageId: String,
+      // val reportType: ReportType
+
+      // @Header("Authorization") authorization: String
+
+      query: `?chattingRoomId=${param1}&keyword=${param2}&lastMessageCreatedDate=${lastMessageCreatedDate}&memberUUID=${user.uuid}`,
+      header: { 'Authorization': `Bearer ${user.memberTokenInfo.accessToken}`, }
+    }
+    FutureInvestApi.postReportMessage(req)
+    .then(res => {
+      // console.log("__apiGetChattingRooms - 1")
+      // console.log(res)
+      if (res.status < 300) {
+        console.log("__apiGetChattingRooms - 2")
+        console.log(res.data)
+        
+        setArrayPageItems(res.data);
+      }
+    })
+    .catch(e=>{
+        // console.log('[CATCH]');
+
+    })
+  }
+
+  function __apiPOSTSendNewFileMessage(param1,param2, lastMessageCreatedDate) {
+    console.log("__apiGetChattingRooms - 0")
+    var formData1 = new FormData();
+    // formData1.append("file", )
+    // @Part file: MultipartBody.Part,
+    const req = {
+
+      // @Query("chattingRoomId") chattingRoomId: Long,
+      // @Query("chattingRoomType") chattingRoomType: ChattingRoomType,
+      // @Query("memberUUID") memberUUID: String,
+      // @Query("sendMemberType") sendMemberType: MemberType,
+      // @Query("replyMessageId") replyMessageId: String?,
+      // @Query("targetMemberUUID") targetMemberUUID: String?,
+      // @Query("imageWidth") width: Int?,
+      // @Query("imageHeight") height: Int?,
+
+      query: `?chattingRoomId=${param1}&keyword=${param2}&lastMessageCreatedDate=${lastMessageCreatedDate}&memberUUID=${user.uuid}`,
+      data : formData1,
+      header: { 'Authorization': `Bearer ${user.memberTokenInfo.accessToken}`, }
+    }
+    FutureInvestApi.getChattingMessagesByKeyword(req)
+    .then(res => {
+      // console.log("__apiGetChattingRooms - 1")
+      // console.log(res)
+      if (res.status < 300) {
+        console.log("__apiGetChattingRooms - 2")
+        console.log(res.data)
+        
+        setArrayPageItems(res.data);
+      }
+    })
+    .catch(e=>{
+        // console.log('[CATCH]');
+
+    })
+  }
+
+  
 
 
   useEffect(() => {

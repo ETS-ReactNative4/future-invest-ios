@@ -8,6 +8,22 @@ export const AuthProvider = ({children}) => {
   const [user, setUser] = useState(null);
   const [objectStore, setObjectStore] = useState(null);
 
+    // {
+    //   "confirmed": false, 
+    //   "id": "test1", 
+    //   "imageUrl": null, 
+    //   "memberTokenInfo": {
+    //      "accessToken": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImV4cCI6MTY1MjEwOTE5MH0.pPK2PYw8xP_zogCMiMbmO3WwKTHigQ84PER5EZbYNC9mjstCuX9sVu78nfqx0lARe5nf4_udVE0OQ0CBkpws3w", 
+    //      "refreshToken": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImV4cCI6MTY1ODI0MzU5MH0.UHKdll2FvExR5pgrIwtZuccZ_Wgcizp8c7pvtoOhxd99REySkgJj1cUvBhm6VmvmvVfqmTQ50fLw2Bz6N39_FA"
+    // }, 
+    //   "memberType": "GENERAL", 
+    //   "messageNotificationReceive": true, 
+    //   "name": "name11", 
+    //   "nickname": "test1", 
+    //   "phone": "01030913971", 
+    //   "replyMessageNotificationReceive": true,
+    //   "uuid": "c91fb122-64"
+    // }
   return (
     <AuthContext.Provider
       value={{

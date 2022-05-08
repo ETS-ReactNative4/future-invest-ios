@@ -35,3 +35,106 @@ https://zpl.io/Am9GkzO
 24. 3_4_마이페이지_내정보관리(경고) (https://zpl.io/Dlk3oew)
 25. 3_5_마이페이지_알림설정 (https://zpl.io/xmGWQEx)
 
+# API 연결 프로세스
+
+로그인 시 서버와 통신 프로세스
+로그인 시도 (/login) -> 성공 시 기기 맥 주소 전송 (/member/updateLoginDevice) -> 완료 시 fcm 토큰 전송 (/token/fcmToken)
+
+맥주소 전송 요청 시 기존에 접속해 있던 기기와 다를 경우 기존에 접속돼있던 기기에 fcm전송 
+fcm 전송 데이터 json 구조
+{
+    "title": "title",
+    "body": "body",
+    "type": "FcmDataType",
+    "obj": "object"
+}
+FcmDataType: 
+ - FCM_NEW_MESSAGE_BY_CHATTING_ROOM_ID
+  채팅방에 새로운 메세지 수신
+  - obj
+  {
+       "chattingRoomId": "Long",
+        "newMessage": {
+              "content": "content(메세지 내용)",
+              "createDate": Long(메세지 생성 time milis),
+            "sendMemberUUID": "String"(작성 유저 UUID),
+              "viewPushMessage": "boolean"(true-알림 생성, false-알림 생성하지않고 채팅방 안 읽은 메세지 개수만 카운팅)
+    }
+  }
+ -  FCM_FORCE_LOGOUT
+  다른 기기에서 로그인 되어 강제 로그아웃
+
+
+# 
+회원가입에서 500나오는건 basic token이 누락되어서의 이슈
+
+Basic YWxiYW5vdGVfaWRfYmxhYzphbGJhbm90ZV9wd2RfMjAxMw==
+
+/login post요청 시에만 basic Token을 Authorization header에 넣어 주시면 될거같습니다.
+
+그 외 요청에는 Authentication에 Bearer [accessToken] 넣어주시면 됩니다.
+
+/member/signup/checkOverlapId
+/member/signup/checkOverlapNickname
+/member/signup/checkOverlapPhone
+/member/signup
+/login
+해당 요청에는 Basic Token 넣어주시면 될거같습니다.
+
+
+# MessagesScreen => 채팅 목록(채팅방 목록)
+# ChatScreen => 채팅 방 안의 메시지 목록
+
+# API 확인 리스트 
+
+- 1. 회원가입 확인 완료
+- 2. 로그인 500 에러
+error response (Basic YWxiYW5vdGVfaWRfYmxhYzphbGJhbm90ZV9wd2RfMjAxMw==)
+{"config": {"adapter": [Function xhrAdapter], "data": "{\"id\":\"test1\",\"pwd\":\"dlatl123!\",\"macAddress\":\"02:00:00:00:00:00\",\"loginMemberType\":\"GENERAL\"}", "env": {"FormData": null}, "headers": {"Accept": "application/json, text/plain, */*", "Authorization": "Basic YWxiYW5vdGVfaWRfYmxhYzphbGJhbm90ZV9wd2RfMjAxMw==", "Content-Type": "application/json"}, "maxBodyLength": -1, "maxContentLength": -1, "method": "post", "timeout": 0, "transformRequest": [[Function transformRequest]], "transformResponse": [[Function transformResponse]], "transitional": {"clarifyTimeoutError": false, "forcedJSONParsing": true, "silentJSONParsing": true}, "url": "http://3.38.20.168:8080/login", "validateStatus": [Function validateStatus], "xsrfCookieName": "XSRF-TOKEN", "xsrfHeaderName": "X-XSRF-TOKEN"}, "data": {"error": "Internal Server Error", "path": "/login", "status": 500, "timestamp": "2022-05-08T15:06:18.810+00:00"}, "headers": {"cache-control": "no-cache, no-store, max-age=0, must-revalidate", "connection": "close", "content-type": "application/json", "date": "Sun, 08 May 2022 15:06:18 GMT", "expires": "0", "pragma": "no-cache", "transfer-encoding": "Identity", "x-content-type-options": "nosniff", "x-xss-protection": "1; mode=block"}, "request": {"DONE": 4, "HEADERS_RECEIVED": 2, "LOADING": 3, "OPENED": 1, "UNSENT": 0, "_aborted": false, "_cachedResponse": undefined, "_hasError": false, "_headers": {"accept": "application/json, text/plain, */*", "authorization": "Basic YWxiYW5vdGVfaWRfYmxhYzphbGJhbm90ZV9wd2RfMjAxMw==", "content-type": "application/json"}, "_incrementalEvents": false, "_lowerCaseResponseHeaders": {"cache-control": "no-cache, no-store, max-age=0, must-revalidate", "connection": "close", "content-type": "application/json", "date": "Sun, 08 May 2022 15:06:18 GMT", "expires": "0", "pragma": "no-cache", "transfer-encoding": "Identity", "x-content-type-options": "nosniff", "x-xss-protection": "1; mode=block"}, "_method": "POST", "_perfKey": "network_XMLHttpRequest_http://3.38.20.168:8080/login", "_performanceLogger": {"_closed": false, "_extras": [Object], "_pointExtras": [Object], "_points": [Object], "_timespans": [Object]}, "_requestId": null, "_response": "{\"timestamp\":\"2022-05-08T15:06:18.810+00:00\",\"status\":500,\"error\":\"Internal Server Error\",\"path\":\"/login\"}", "_responseType": "", "_sent": true, "_subscriptions": [], "_timedOut": false, "_trackingName": "unknown", "_url": "http://3.38.20.168:8080/login", "readyState": 4, "responseHeaders": {"Cache-Control": "no-cache, no-store, max-age=0, must-revalidate", "Connection": "close", "Content-Type": "application/json", "Date": "Sun, 08 May 2022 15:06:18 GMT", "Expires": "0", "Pragma": "no-cache", "Transfer-Encoding": "Identity", "X-Content-Type-Options": "nosniff", "X-XSS-Protection": "1; mode=block"}, "responseURL": "http://3.38.20.168:8080/login", "status": 500, "timeout": 0, "upload": {}, "withCredentials": true}, "status": 500, "statusText": undefined}
+
+ (Basic ZnV0dXJlaW52ZXN0OmZ1dHVyZXBhc3N3b3Jk) -> 이걸로 하니 되어서 임시 처리 (response)
+
+ - 3. /member/updateLoginDevice
+
+
+##
+npx react-native-clean-project
+Need to install the following packages:
+  react-native-clean-project
+Ok to proceed? (y) y
+Wipe iOS build folder? (Y/n) Y
+Wipe iOS Pods folder? (Y/n) Y
+Wipe system iOS Pods cache? (Y/n) Y
+Wipe user iOS Pods cache? (Y/n) Y
+Update pods? (Y/n) Y
+Wipe android build folder? (Y/n) Y
+Clean Android project? (Y/n) Y
+Wipe node_modules folder? (Y/n) Y
+Update brew? (Y/n) Y
+
+
+
+
+
+// https://yannichoongs.tistory.com/192
+// yannichoongs.tistory.com/195
+// https://velog.io/@mementomori/React-Native-Chatting-구현
+// https://blog.logrocket.com/build-chat-app-react-native-gifted-chat/
+// https://stackoverflow.com/questions/61483269/highlight-the-search-text-in-flatlist-react-native
+// https://medium.com/@decentpianist/react-native-chat-with-image-and-audio-c09054ca2204
+
+// OBJECT SAMPLE
+// export interface IMessage {
+//   _id: string | number
+//   text: string
+//   createdAt: Date | number
+//   user: User
+//   image?: string
+//   video?: string
+//   audio?: string
+//   system?: boolean
+//   sent?: boolean
+//   received?: boolean
+//   pending?: boolean
+//   quickReplies?: QuickReplies
+// }

@@ -51,16 +51,42 @@ const LoginScreen = ({navigation}) => {
         macAddress : mac,
         loginMemberType : "GENERAL"
     }
-    const req = { data : sendObject }
+    const req = { data : sendObject, header: { 'Authorization': "Basic ZnV0dXJlaW52ZXN0OmZ1dHVyZXBhc3N3b3Jk", } }
     FutureInvestApi.login(req)
     .then(res => {
+
+      // console.log("FutureInvestApi.login - 0")
+      // console.log(res)
       if (res.status < 300) {
-        setUser({id : email, name: "testtesttestname", })
+
+        console.log("FutureInvestApi.login - 1")
+        console.log(res.data)
+        // TEMP
+        // setBoolPermissionPopup(false)
+        setUser(res.data)
+
+        // LOGIN RESPONSE (res.data)
+        // {
+        //   "confirmed": false, 
+        //   "id": "test1", 
+        //   "imageUrl": null, 
+        //   "memberTokenInfo": {"accessToken": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImV4cCI6MTY1MjEwOTE5MH0.pPK2PYw8xP_zogCMiMbmO3WwKTHigQ84PER5EZbYNC9mjstCuX9sVu78nfqx0lARe5nf4_udVE0OQ0CBkpws3w", "refreshToken": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImV4cCI6MTY1ODI0MzU5MH0.UHKdll2FvExR5pgrIwtZuccZ_Wgcizp8c7pvtoOhxd99REySkgJj1cUvBhm6VmvmvVfqmTQ50fLw2Bz6N39_FA"}, 
+        //   "memberType": "GENERAL", 
+        //   "messageNotificationReceive": true, 
+        //   "name": "name11", 
+        //   "nickname": "test1", 
+        //   "phone": "01030913971", 
+        //   "replyMessageNotificationReceive": true,
+        //   "uuid": "c91fb122-64"
+        // }
+      } else {
+        alert("회원정보를 확인해주세요!")
       }
     })
     .catch(e=>{
         // console.log('[CATCH]');
-        console.log(e && e.response);
+        // console.log(e && e.response);
+        alert("회원정보를 확인해주세요.")
 
     })
     
@@ -69,6 +95,69 @@ const LoginScreen = ({navigation}) => {
     
 
 }
+
+function __apiPostUpdateLoginDevice(param1) {
+
+  var sendObject = {
+        
+    id : email,
+  }
+  const req = { data : sendObject, header: { 'Authorization': `Bearer ${param1}`, } }
+  FutureInvestApi.updateLoginDevice(req)
+  .then(res => {
+    // console.log("FutureInvestApi.login - 0")
+    // console.log(res)
+    if (res.status < 300) {
+      console.log("FutureInvestApi.login - 1")
+      console.log(res.data)
+      // TEMP
+      // setBoolPermissionPopup(false)
+      // setUser(res.data)
+    } else {
+      alert("회원정보를 확인해주세요!")
+    }
+  })
+  .catch(e=>{
+      // console.log('[CATCH]');
+      // console.log(e && e.response);
+      alert("회원정보를 확인해주세요.")
+
+  })
+}
+
+
+function __apiPostUpdateFcmToken(param1) {
+
+  var sendObject = {
+        
+    id : email,
+}
+const req = { data : sendObject, header: { 'Authorization': `Bearer ${param1}`, } }
+FutureInvestApi.updateFcmToken(req)
+.then(res => {
+
+  // console.log("FutureInvestApi.login - 0")
+  // console.log(res)
+  if (res.status < 300) {
+
+    console.log("FutureInvestApi.login - 1")
+    console.log(res.data)
+    // TEMP
+    // setBoolPermissionPopup(false)
+    // setUser(res.data)
+  } else {
+    alert("회원정보를 확인해주세요!")
+  }
+})
+.catch(e=>{
+    // console.log('[CATCH]');
+    // console.log(e && e.response);
+    alert("회원정보를 확인해주세요.")
+
+})
+
+}
+
 
 
   return (
@@ -81,13 +170,28 @@ const LoginScreen = ({navigation}) => {
           onRequestClose={() => {
             setBoolPermissionPopup(false)
           }} >
+            <TouchableOpacity
+            style={{ position: 'absolute', width: windowWidth, height: windowHeight}}
+              onPress={()=> {
+                console.log("false")
+                setBoolPermissionPopup(false)
+              }}
+            >
+            </TouchableOpacity>
         <View style={[{ width : windowWidth, height: windowHeight, backgroundColor: "rgba(10,10,10,0.7)", alignItems: "center", justifyContent: "center"},]}>
           <View style={[
               {  width : windowWidth - 40, height: 364 , alignSelf: "center",  alignItems: "flex-start", justifyContent: "center", backgroundColor: "#F8F8F8", borderRadius : 40, overflow: 'hidden', position: 'relative' },
               {  borderRadius: 8, shadowColor: '#000',  shadowOffset: {width: 0, height: 2}, shadowOpacity: 0.25, shadowRadius: 3.84, elevation: 5, backgroundColor: '#F8F8F8', overflow: 'hidden' },]}
             >
                   {/* icon_warning1 */}
-              <Image style={styles.popupCloseIconImg} source={require('../assets/icon_black_top_close0.png')} />
+                  <TouchableOpacity
+                  style={styles.popupCloseIconImgWrapper}
+                  onPress={()=> {
+                    setBoolPermissionPopup(false)
+                  }}
+                  >
+                  <Image style={styles.popupCloseIconImg} source={require('../assets/icon_black_top_close0.png')} />
+                  </TouchableOpacity>
               <View style={{   width : windowWidth - 80, display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start',marginLeft: 'auto', marginRight: 'auto' }}>
                 <Text  style={{  fontSize: 16,  color : "#303030", fontStyle: 'normal', fontWeight: 'bold', textAlign: 'left'}}>VIP 리딩 어플을 이용하려면{"\n"}아래의 권한을 허용해주세요.</Text>
               </View>
@@ -116,10 +220,10 @@ const LoginScreen = ({navigation}) => {
 
               <TouchableOpacity style={{ width : (windowWidth - 80), height: 50, color : "#303030", backgroundColor: "#fceb39", borderRadius: 40, alignItems: "center", justifyContent: "center",  marginLeft: 'auto', marginRight: 'auto', marginTop: 20}} 
                 onPress={()=> { 
-                  setBoolPermissionPopup(false)
+                  // 
                   // 퍼미션 요청
                   // TEST
-                  setUser({id : 123, name: 123, })
+                  // setUser({id : 123, name: 123, })
                   // PROD
                   // __apiPostLogin();
 
@@ -181,8 +285,8 @@ const LoginScreen = ({navigation}) => {
       <FormButton
         buttonTitle="로그인"
         onPress={() => {
-          setBoolPermissionPopup(true);
-          
+          // setBoolPermissionPopup(true);
+          __apiPostLogin();
         }}
       />
 
@@ -316,14 +420,16 @@ const styles = StyleSheet.create({
     objectFit : 'contain',
     marginRight: 4,
   },
+  popupCloseIconImgWrapper : {
 
+    position: 'absolute',
+    right: 20,
+    top: 20,
+  },
   popupCloseIconImg: {
     width: 20,
     height: 20,
     objectFit : 'contain',
-    position: 'absolute',
-    right: 20,
-    top: 20,
   },
   archiveIconImg: {
     width: 20,

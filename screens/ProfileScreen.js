@@ -10,110 +10,157 @@ import {
 } from 'react-native';
 import FormButton from '../components/FormButton';
 import {AuthContext} from '../navigation/AuthProvider';
-
 import firestore from '@react-native-firebase/firestore';
 import PostCard from '../components/PostCard';
 import { windowHeight, windowWidth } from '../utils/Dimentions';
+import DeviceInfo from 'react-native-device-info'; 
+
+import * as BaseApi from "../api/BaseApi";
+import * as FutureInvestApi from "../api/FutureInvestApi";
 
 const ProfileScreen = ({navigation, route}) => {
   const {user, setUser, objectStore, setObjectStore, logout} = useContext(AuthContext);
-
-  const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [deleted, setDeleted] = useState(false);
   const [userData, setUserData] = useState(null);
-
-  const fetchPosts = async () => {
-    try {
-      const list = [];
-
-      await firestore()
-        .collection('posts')
-        .where('userId', '==', route.params ? route.params.userId : user.uid)
-        .orderBy('postTime', 'desc')
-        .get()
-        .then((querySnapshot) => {
-          // console.log('Total Posts: ', querySnapshot.size);
-
-          querySnapshot.forEach((doc) => {
-            const {
-              userId,
-              post,
-              postImg,
-              postTime,
-              likes,
-              comments,
-            } = doc.data();
-            list.push({
-              id: doc.id,
-              userId,
-              userName: 'Test Name',
-              userImg:
-                'https://lh5.googleusercontent.com/-b0PKyNuQv5s/AAAAAAAAAAI/AAAAAAAAAAA/AMZuuclxAM4M1SCBGAO7Rp-QP6zgBEUkOQ/s96-c/photo.jpg',
-              postTime: postTime,
-              post,
-              postImg,
-              liked: false,
-              likes,
-              comments,
-            });
-          });
-        });
-
-      setPosts(list);
-
-      if (loading) {
-        setLoading(false);
-      }
-
-      console.log('Posts: ', posts);
-    } catch (e) {
-      console.log(e);
+  
+  function __apiPostLogout(param1) {
+    const req = {
+      // data : sendObject,
+      query: `?memberUUID=${user.uuid}`,
+      header: { 'Authorization': `Bearer ${user.memberTokenInfo.accessToken}`, }
     }
-  };
 
-  const getUser = async() => {
-    await firestore()
-    .collection('users')
-    .doc( route.params ? route.params.userId : user.uid)
-    .get()
-    .then((documentSnapshot) => {
-      if( documentSnapshot.exists ) {
-        console.log('User Data', documentSnapshot.data());
-        setUserData(documentSnapshot.data());
+    FutureInvestApi.logout(req)
+    .then(res => {
+      console.log("FutureInvestApi.logout")
+      console.log(res)
+      if (res.status < 300) {
+        alert("로그아웃되었습니다.");
+        setUser(null);
       }
+      return 
     })
+    .catch(e=>{
+      // console.log('[CATCH]');
+      console.log(e && e.response);
+      alert("에러가 발생했습니다.")
+
+    })
+    
+
+}
+
+
+    // /** 프로필 사진 변경 **/
+    // @Multipart
+    // @POST("/member/changeImage")
+    // suspend fun updateChangeImage(
+    //     @Part file: MultipartBody.Part,
+    //     @Query("memberUUID") memberUUID: String,
+    //     @Header("Authorization") authorization: String
+    // ): Response<Map<String, String>>
+
+    // @PUT("/member/changeInfo")
+    // suspend fun putChangeInfo(
+    //     @Body body: BodyWithMemberUUIDRequestDTO<MemberInfoChangeRequestDTO>,
+    //     @Header("Authorization") authorization: String
+    // ): Response<Boolean>
+
+
+function __apiGetChattingRooms(param1) {
+  console.log("__apiGetChattingRooms - 0")
+  const req = {
+    query: `?chattingRoomId=${param1}&memberUUID=${user.uuid}`,
+    header: { 'Authorization': `Bearer ${user.memberTokenInfo.accessToken}`, }
+  }
+  FutureInvestApi.getChattingRoomInitData(req)
+  .then(res => {
+    // console.log("__apiGetChattingRooms - 1")
+    // console.log(res)
+    if (res.status < 300) {
+    }
+  })
+  .catch(e=>{
+      // console.log('[CATCH]');
+
+  })
+}
+
+function __apiPutChangeAlarmStatus(param1) {
+  console.log("__apiPutChangeAlarmStatus - 0")
+  // @SerializedName("body") val body: T,
+    // val isMessageAlarmNotificationReceive: Boolean?,
+    // val isReplyMessageAlarmNotificationReceive: Boolean?,
+  // @SerializedName("memberUUID") val memberUUID: String
+  const req = {
+    query: `?chattingRoomId=${param1}&memberUUID=${user.uuid}`,
+    header: { 'Authorization': `Bearer ${user.memberTokenInfo.accessToken}`, }
+  }
+  FutureInvestApi.putChangeAlarmStatus(req)
+  .then(res => {
+    // console.log("__apiGetChattingRooms - 1")
+    // console.log(res)
+    if (res.status < 300) {
+    }
+  })
+  .catch(e=>{
+      // console.log('[CATCH]');
+
+  })
+}
+
+
+function __apiPostWithdrawal(param1) {
+  const req = {
+    // data : sendObject,
+    query: `?memberUUID=${user.uuid}`,
+    header: { 'Authorization': `Bearer ${user.memberTokenInfo.accessToken}`, }
   }
 
+  FutureInvestApi.withdrawal(req)
+  .then(res => {
+    console.log("FutureInvestApi.logout")
+    console.log(res)
+    if (res.status < 300) {
+      alert("탈퇴처리 되었습니다.");
+      setUser(null);
+    }
+    return 
+  })
+  .catch(e=>{
+    // console.log('[CATCH]');
+    console.log(e && e.response);
+    alert("에러가 발생했습니다.")
+
+  })
+  
+
+}
+
+
   useEffect(() => {
-    getUser();
-    fetchPosts();
     navigation.addListener("focus", () => setLoading(!loading));
   }, [navigation, loading]);
 
   const handleDelete = () => {};
 
   return (
-//     icon_profile_approbation.png
-// icon_profile_pencil.png
-// icon_profile_pencil1.png
-// icon_profile_switch_off.png
-// icon_profile_switch_on.png 
-
+  // icon_profile_approbation.png
+  // icon_profile_pencil.png
+  // icon_profile_pencil1.png
+  // icon_profile_switch_off.png
+  // icon_profile_switch_on.png 
     <SafeAreaView style={{flex: 1, backgroundColor: '#fceb39'}}>
       <ScrollView
         style={styles.container}
         contentContainerStyle={{justifyContent: 'center', alignItems: 'center'}}
         showsVerticalScrollIndicator={false}>
-
           <View style={{ width: windowWidth, height: 260, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor:'#fceb39',  position: 'absolute', top: 0, zIndex: 1,}}>
-
           <TouchableOpacity style={styles.top1_button1} 
             onPress={()=> {
               navigation.navigate('EditProfileImageAndNicknameScreen',)
             }} 
           >
-
             <Text style={styles.top1_text1}>수정하기</Text>
             <Image style={styles.top1_image1} 
               source={
@@ -121,8 +168,6 @@ const ProfileScreen = ({navigation, route}) => {
             } 
             />
           </TouchableOpacity>
-
-
 
             <Image
               style={styles.userImg}
@@ -177,7 +222,6 @@ const ProfileScreen = ({navigation, route}) => {
               <View style={{ minHeight: 1 , width: windowWidth - 140, backgroundColor: '#ebebeb', marginLeft: 'auto', marginRight: 'auto'}}></View>
               
               <TouchableOpacity style={{ width: '100%', height: 40, display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 10}}
-              
               onPress={()=> {
                 navigation.navigate('EditProfileNotification',)
               }} 
@@ -201,7 +245,11 @@ const ProfileScreen = ({navigation, route}) => {
               justifyContent: 'center'
             }}
             onPress={()=> {
-              setUser(null);
+              // DEV 
+              // user && user.uuid && console.log("user.uuid ::: ", user.uuid);
+              // setUser(null);
+              // PROD
+              __apiPostLogout();
             }}
             >
               <Text>로그아웃</Text>
@@ -214,7 +262,9 @@ const ProfileScreen = ({navigation, route}) => {
             >
               <TouchableOpacity 
               onPress={()=> {
-                setUser(null);
+                // DEV
+                // setUser(null);
+                __apiPostWithdrawal();
               }}>
             <Text 
               style={{ color : "#aeaeae"}}

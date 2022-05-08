@@ -7,8 +7,6 @@ import FormButton from '../components/FormButton';
 import SocialButton from '../components/SocialButton';
 import {AuthContext} from '../navigation/AuthProvider';
 import DeviceInfo from 'react-native-device-info'; 
-
-
 import * as BaseApi from "../api/BaseApi";
 import * as FutureInvestApi from "../api/FutureInvestApi";
 import { ScrollView } from 'react-native-gesture-handler';
@@ -114,7 +112,8 @@ const SignupScreen = ({navigation}) => {
   function __apiCheckOverlapId() {
     //checkOverlapId
     const req = {
-      query : `?id=${id}` 
+      query : `?id=${id}` ,
+      header: { 'Authorization': "Basic ZnV0dXJlaW52ZXN0OmZ1dHVyZXBhc3N3b3Jk", } 
     }
     FutureInvestApi.checkOverlapId(req)
     .then(res => {
@@ -145,7 +144,8 @@ const SignupScreen = ({navigation}) => {
   function __apiCheckOverlapNickname() {
     //checkOverlapNickname
     const req = {
-      query : `?nickname=${textNickname}` 
+      query : `?nickname=${textNickname}` ,
+      header: { 'Authorization': "Basic ZnV0dXJlaW52ZXN0OmZ1dHVyZXBhc3N3b3Jk", } 
     }
     FutureInvestApi.checkOverlapNickname(req)
     .then(res => {
@@ -172,7 +172,8 @@ const SignupScreen = ({navigation}) => {
 
   function __apiCheckOverlapPhone() {
     const req = {
-      query : `?phone=${textPhone1 + "" + textPhone2}` 
+      query : `?phone=${textPhone1 + "" + textPhone2}`,
+      header: { 'Authorization': "Basic ZnV0dXJlaW52ZXN0OmZ1dHVyZXBhc3N3b3Jk", } 
     }
     
     FutureInvestApi.checkOverlapPhone(req)

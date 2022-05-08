@@ -6,10 +6,8 @@ import FormButton from '../components/FormButton';
 import SocialButton from '../components/SocialButton';
 import {AuthContext} from '../navigation/AuthProvider';
 
-
 const device_width = Dimensions.get('window').width;
 const device_height = Dimensions.get('window').height;
-
 const SignupScreen = ({navigation}) => {
   const [id, setId] = useState();
   const [textNickname, setTextNickname] = useState("");

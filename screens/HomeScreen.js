@@ -9,14 +9,10 @@ import {
   Alert,
 } from 'react-native';
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
-
 import Ionicons from 'react-native-vector-icons/Ionicons';
-
 import PostCard from '../components/PostCard';
-
 import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
-
 import {Container} from '../styles/FeedStyles';
 
 const Posts = [

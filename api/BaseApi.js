@@ -12,5 +12,5 @@ export function postRefreshToken(req){
 export function getCurrentServerTime(req){
 
     // @Header("Authorization") authorization: String
-	return axios({ method: 'GET', url: SERVER_URL + `currentTime`, data: null, headers: req.header })
+	return axios({ method: 'GET', url: SERVER_URL + `currentTime`, data: req.header, headers: req.header })
 }
