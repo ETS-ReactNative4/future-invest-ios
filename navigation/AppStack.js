@@ -145,8 +145,13 @@ const FeedStack = ({navigation}) => (
 
 const MessageStack = ({navigation}) => {
 
-  const {user, setUser, objectStore, setObjectStore,actionName, setActionName, objectChatRoom1
-    , setObjectChatRoom1} = useContext(AuthContext);
+  const {
+    user, setUser, 
+    objectStore, setObjectStore,
+    actionName,setActionName, 
+    objectChatRoom1, setObjectChatRoom1,
+    objectChattingRoomInfo, setObjectChattingRoomInfo,
+} = useContext(AuthContext);
 
   return (
   <Stack.Navigator
@@ -195,17 +200,22 @@ const MessageStack = ({navigation}) => {
             </MessageIconLeftWrapper>
             <MessageCenterWrapper>
               <Text  style={{ width: "100%", height: 24,marginTop: 40, textAlign: 'center', color : "#303030",fontWeight: "bold", fontSize: 16  }}>
-                {route.params.userName}
+                {objectChattingRoomInfo && objectChattingRoomInfo.chattingRoomTitle && objectChattingRoomInfo.chattingRoomTitle }
               </Text>
             </MessageCenterWrapper>
             <MessageIconRightWrapper>
               <TouchableOpacity 
               onPress={()=> { 
-                
-                
+                setObjectStore(
+                  { type : 'search', code : 'search/chat'}
+                );
               }}
               >
-                <Image source={require('../assets/chat/icon_chat_search0.png')} resizeMode={'contain'} style={{ width: 24, height: 24, marginRight: 20, marginTop: 40 }}></Image>
+                <Image 
+                  source={require('../assets/chat/icon_chat_search0.png')} 
+                  resizeMode={'contain'}
+                  style={{ width: 24, height: 24, marginRight: 20, marginTop: 40 }}
+                ></Image>
               </TouchableOpacity>
               <TouchableOpacity
               onPress={()=> { 
@@ -214,7 +224,11 @@ const MessageStack = ({navigation}) => {
                 );
               }}
               >
-                <Image source={require('../assets/chat/icon_chat_more0.png')} resizeMode={'contain'} style={{ width: 24, height: 24, marginRight: 20, marginTop: 40 }}></Image>
+                <Image 
+                  source={require('../assets/chat/icon_chat_more0.png')} 
+                  resizeMode={'contain'}
+                  style={{ width: 24, height: 24, marginRight: 20, marginTop: 40  }}
+                ></Image>
               </TouchableOpacity>
             </MessageIconRightWrapper>
           </MessageHeader>

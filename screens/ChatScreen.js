@@ -21,29 +21,40 @@ const safeAreaHeight= Dimensions.get("window").height - getStatusBarHeight() - g
 
 
 const ChatScreen = () => {
-  const {user, setUser, objectStore, setObjectStore,  actionName,  setActionName} = useContext(AuthContext);
+  const {
+      user, setUser, 
+      objectStore, setObjectStore,  
+      actionName, setActionName , 
+      objectChatRoom1, setObjectChatRoom1,
+      objectChattingRoomInfo, setObjectChattingRoomInfo,
 
-  
+    } = useContext(AuthContext);
+
+
   const [messages, setMessages] = useState([]);
   const [boolOpenSidebar, setBoolOpenSidebar] = useState(false);
   const [boolOpenToast, setBoolOpenToast] = useState(false);
   const [boolOpenBottomInfo, setBoolOpenBottomInfo] = useState(false);
   const [boolNotificationPossible, setBoolNotificationPossible] = useState(false);
   const [arrayUsers, setArrayUsers] = useState([
-    {_id: 1, avatar: "https://placeimg.com/140/140/any", name: "한국매일증권"},
-    {_id: 2, avatar: "https://placeimg.com/140/140/any", name: "상담관리자"},
-    {_id: 3, avatar: "https://placeimg.com/140/140/any", name: "닉네임최대아홉자요"},
+    // {_id: 1, avatar: "https://placeimg.com/140/140/any", name: "한국매일증권"},
+    // {_id: 2, avatar: "https://placeimg.com/140/140/any", name: "상담관리자"},
+    // {_id: 3, avatar: "https://placeimg.com/140/140/any", name: "닉네임최대아홉자요"},
   ]);
+
 
   useEffect(()=> {
     setActionName("");
-    __apiGetChattingMessages();
+    __apiGetChattingRoomInitData(objectChatRoom1);
+    // __apiGetChattingMessages(objectChatRoom1);
   }, [])
 
 
   useEffect(() => {
-    console.log("objectStore");
+    console.log("ChatScreen objectStore");
     console.log(objectStore);
+    console.log("ChatScreen objectChatRoom1");
+    console.log(objectChatRoom1);
 
     if (objectStore && objectStore.type && objectStore.type == "popup") {
       setBoolOpenSidebar(true);
@@ -79,21 +90,70 @@ const ChatScreen = () => {
 
     })
   }
+
+  function __apiGetChattingRoomInitData(param1) {
+    console.log("__apiGetChattingRooms - 0", param1)
+    console.log("--> ", `?chattingRoomId=${param1}&memberUUID=${user.uuid}`)
+    const req = {
+      query: `?chattingRoomId=${param1}&memberUUID=${user.uuid}`,
+      header: { 'Authorization': `Bearer ${user.memberTokenInfo.accessToken}`, }
+    }
+    FutureInvestApi
+    .getChattingRoomInitData(req)
+    .then(res => {
+
+      if (res.status < 300) {
+        console.log("__apiGetChattingRoomInitData - 2")
+        console.log(res.data)
+        setObjectChattingRoomInfo(res.data);
+        setMessages(res.data.chattingRoomMessages)
+
+        // {"chattingRoomInform": null, 
+        // "chattingRoomMembers": [
+      //       {"memberImageUrl": null, 
+      //       "memberLastAccessDate": null, 
+      //       "memberName": "asd", 
+      //       "memberNickname": "test2", 
+      //       "memberType": "GENERAL", 
+      //       "memberUUID": "dffb3741-27"
+      //     }, 
+      //   ], 
+      //   "chattingRoomMessages": [], 
+      //   "chattingRoomTitle": "ios_test_공개방", 
+      //   "chattingRoomType": "PUBLIC", 
+      //   "isNotificationReceive": true
+      // }
+      }
+    })
+    .catch(e=>{
+        console.log('[CATCH]');
+        console.log("getChattingMessages - 1")
+        console.log(e)
+
+    })
+  }
+
+
+
   function __apiGetChattingMessages(param1) {
-    console.log("__apiGetChattingRooms - 0")
+    console.log("__apiGetChattingRooms - 0", param1)
+    console.log("--> ", `?chattingRoomId=${param1}&memberUUID=${user.uuid}`)
     const req = {
       query: `?chattingRoomId=${param1}&memberUUID=${user.uuid}`,
       header: { 'Authorization': `Bearer ${user.memberTokenInfo.accessToken}`, }
     }
     FutureInvestApi.getChattingMessages(req)
     .then(res => {
-      // console.log("__apiGetChattingRooms - 1")
-      // console.log(res)
+      console.log("getChattingMessages - 1")
+      console.log(res)
+
       if (res.status < 300) {
       }
     })
     .catch(e=>{
-        // console.log('[CATCH]');
+        console.log('[CATCH]');
+        console.log("getChattingMessages - 1")
+        console.log(e)
 
     })
   }
@@ -114,8 +174,8 @@ function __apiPutUpdateChattingRoomNotification(param1) {
   }
   FutureInvestApi.putChangeAlarmStatus(req)
   .then(res => {
-    // console.log("__apiGetChattingRooms - 1")
-    // console.log(res)
+    console.log("putChangeAlarmStatus - 1")
+    console.log(res)
     if (res.status < 300) {
     }
   })
@@ -135,8 +195,8 @@ function __apiPutUpdateChattingRoomNotification(param1) {
     }
     FutureInvestApi.getChattingMessagesByKeyword(req)
     .then(res => {
-      // console.log("__apiGetChattingRooms - 1")
-      // console.log(res)
+      console.log("getChattingMessagesByKeyword - 1")
+      console.log(res)
       if (res.status < 300) {
       }
     })
@@ -163,10 +223,9 @@ function __apiPutUpdateChattingRoomNotification(param1) {
     }
     FutureInvestApi.postReportMessage(req)
     .then(res => {
-      // console.log("__apiGetChattingRooms - 1")
-      // console.log(res)
+      console.log("postReportMessage - 1")
+      console.log(res)
       if (res.status < 300) {
-        console.log("__apiGetChattingRooms - 2")
         console.log(res.data)
         
         setArrayPageItems(res.data);
@@ -174,7 +233,7 @@ function __apiPutUpdateChattingRoomNotification(param1) {
     })
     .catch(e=>{
         // console.log('[CATCH]');
-
+        
     })
   }
 
@@ -203,9 +262,7 @@ function __apiPutUpdateChattingRoomNotification(param1) {
       // console.log("__apiGetChattingRooms - 1")
       // console.log(res)
       if (res.status < 300) {
-        console.log("__apiGetChattingRooms - 2")
         console.log(res.data)
-        
         setArrayPageItems(res.data);
       }
     })
@@ -220,44 +277,45 @@ function __apiPutUpdateChattingRoomNotification(param1) {
 
   useEffect(() => {
     setMessages([
-      {
-        _id: 1,
-        text: `SK 바이오팜
-        4Q21 Review : 어닝 서프라이즈, 연간 흑자 전환
-        영업이익 1,344억 원(흑자 전환)으로 어닝 서프라이즈를 기록하며 2021년 사상 최대 실적 기록`,
-        createdAt: new Date(),
-        user: {
-          _id: 2,
-          name: 'React Native',
-          avatar: 'https://placeimg.com/140/140/any',
-        },
-      },
-      {
-        _id: 2,
-        text: 'Hello world',
-        createdAt: new Date(),
-        user: {
-          _id: 1,
-          name: 'React Native',
-          avatar: 'https://placeimg.com/140/140/any',
-        },
-      },
-      {
-        _id: 3,
-        text: 'Hello world',
-        createdAt: new Date(),
-        user: {
-          _id: 1,
-          name: 'React Native',
-          avatar: 'https://placeimg.com/140/140/any',
-        },
-      },
+      // {
+      //   _id: 1,
+      //   text: `SK 바이오팜
+      //   4Q21 Review : 어닝 서프라이즈, 연간 흑자 전환
+      //   영업이익 1,344억 원(흑자 전환)으로 어닝 서프라이즈를 기록하며 2021년 사상 최대 실적 기록`,
+      //   createdAt: new Date(),
+      //   user: {
+      //     _id: 2,
+      //     name: 'React Native',
+      //     avatar: 'https://placeimg.com/140/140/any',
+      //   },
+      // },
+      // {
+      //   _id: 2,
+      //   text: 'Hello world',
+      //   createdAt: new Date(),
+      //   user: {
+      //     _id: 1,
+      //     name: 'React Native',
+      //     avatar: 'https://placeimg.com/140/140/any',
+      //   },
+      // },
+      // {
+      //   _id: 3,
+      //   text: 'Hello world',
+      //   createdAt: new Date(),
+      //   user: {
+      //     _id: 1,
+      //     name: 'React Native',
+      //     avatar: 'https://placeimg.com/140/140/any',
+      //   },
+      // },
     ]);
   }, []);
 
   const onSend = useCallback((messages = []) => {
     setMessages((previousMessages) =>
       GiftedChat.append(previousMessages, messages),
+      
     );
   }, []);
 
@@ -474,10 +532,43 @@ function __apiPutUpdateChattingRoomNotification(param1) {
               { zIndex: 99, },
             ]}
            >
-             {/* top HEADER */}
+             {/* top HEADER 
+             
+             
+        // {"chattingRoomInform": null, 
+        // "chattingRoomMembers": [
+      //       {"memberImageUrl": null, 
+      //       "memberLastAccessDate": null, 
+      //       "memberName": "asd", 
+      //       "memberNickname": "test2", 
+      //       "memberType": "GENERAL", 
+      //       "memberUUID": "dffb3741-27"
+      //     }, 
+      //     {"memberImageUrl": null, 
+      //     "memberLastAccessDate": null, 
+      //     "memberName": "ios_test", 
+      //     "memberNickname": "ios_test",
+      //      "memberType": "MANAGER", 
+      //      "memberUUID": "7afe18d4-ac"
+      //     }
+      //   ], 
+      //   "chattingRoomMessages": [], 
+      //   "chattingRoomTitle": "ios_test_공개방", 
+      //   "chattingRoomType": "PUBLIC", 
+      //   "isNotificationReceive": true
+      // }*/}
+
              <View style={[styles.sidebarTop1, ]}>
                 <Text style={styles.sidebarTop1_Text1}>참여자 리스트</Text>
-                <Text style={styles.sidebarTop1_Text2}>15</Text>
+
+
+                <Text style={styles.sidebarTop1_Text2}>
+                  {
+                    objectChattingRoomInfo && 
+                    objectChattingRoomInfo.chattingRoomMembers && 
+                    objectChattingRoomInfo.chattingRoomMembers.length
+                  }
+                </Text>
                 <TouchableOpacity
                   onPress={()=> {
                     setBoolNotificationPossible(!boolNotificationPossible)
@@ -499,7 +590,12 @@ function __apiPutUpdateChattingRoomNotification(param1) {
             <View style={styles.sidebar_UserItems_Container}>
               
             {
-              arrayUsers && arrayUsers.map((arrayItem, arrayIndex)=> {
+              objectChattingRoomInfo && 
+              objectChattingRoomInfo.chattingRoomMembers && 
+              objectChattingRoomInfo.chattingRoomMembers.map((arrayItem, arrayIndex)=> {
+
+                console.log("arrayItem", arrayItem)
+                // {"memberImageUrl": null, "memberLastAccessDate": null, "memberName": "asd", "memberNickname": "test2", "memberType": "GENERAL", "memberUUID": "dffb3741-27"}
                 return (
 
                 <View style={styles.sidebar_UserItemRow1} key={`arrayIndex_` + arrayIndex}>
@@ -507,16 +603,20 @@ function __apiPutUpdateChattingRoomNotification(param1) {
                   <Image style={styles.sidebar_UserItemRow1_Image0} 
                     // source={arrayItem.avatar} 
                     source={
+                      arrayItem.memberImageUrl ?
+                      arrayItem.memberImageUrl :
                       require('../assets/chat/icon_chat_profile0.png')
                     }
                     resizeMode={"contain"}
                   ></Image>
                 </View>
                 {
-                  arrayItem._id == 1 &&
+                  arrayItem.memberUUID == user.uuid &&
                   <Text style={styles.sidebar_UserItemRow1_Text1}>나</Text>
                 }
-                <Text style={styles.sidebar_UserItemRow1_Text2}>{arrayItem.name}</Text>
+                <Text style={styles.sidebar_UserItemRow1_Text2}>
+                  {arrayItem.memberNickname}
+                </Text>
               </View>
                 )
               })

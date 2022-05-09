@@ -106,7 +106,7 @@ color : #cccccc;
 const MessagesScreen = ({navigation}) => {
   const [mode, setMode] = useState(0);
   const [arrayPageItems, setArrayPageItems] = useState([]);
-  const {user, setUser, login, googleLogin, fbLogin,  actionName,  setActionName, setObjectChatRoom1, objectChatRoom1} = useContext(AuthContext);
+  const {user, setUser, login, googleLogin, fbLogin,  actionName,  setActionName,objectChatRoom1, setObjectChatRoom1, } = useContext(AuthContext);
 
   useEffect(()=> {
     __apiGetChattingRooms();
@@ -226,8 +226,8 @@ function __apiGetChattingRooms() {
       // console.log("__apiGetChattingRooms - 1")
       // console.log(res)
       if (res.status < 300) {
-        console.log("__apiGetChattingRooms - 2")
         console.log(res.data)
+        
         // [
         //   {
         //     "chattingRoomId": 57,
@@ -308,8 +308,19 @@ function __apiGetChattingRooms() {
             keyExtractor={item=>item.id}
             renderItem={({item}) => (
               <Card onPress={() => {
-                // objectChatRoom1
-                  // setObjectChatRoom1
+                
+        //     "chattingRoomId": 58,
+        //     "chattingRoomImageUrl": null,
+        //     "chattingRoomMemberCount": 0,
+        //     "chattingRoomStatus": "ACTIVITY",
+        //     "chattingRoomTitle": "ios_test_비공개방",
+        //     "chattingRoomType": "PRIVATE",
+        //     "isReceiveNotification": true,
+        //     "lastMessageContent": "",
+        //     "lastMessageCreatedDate": null,
+        //     "unreadMessageCount": 0
+
+                  setObjectChatRoom1(item.chattingRoomId)
                   navigation.navigate('Chat', {userName: item.userName})
                 }}>
                 <UserInfo>

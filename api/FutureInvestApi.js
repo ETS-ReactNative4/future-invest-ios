@@ -64,7 +64,7 @@ export function getChattingMessages(req){
     // @Query("lastMessageCreatedDate") lastMessageCreatedDate: Long,
     // @Query("memberUUID") memberUUID: String,
     // @Header("Authorization") accessToken: String
-	return axios({ method: 'GET', url: SERVER_URL + `chatting/chattingRoom/messages${req.query}`, data: req.data, headers: req.header })
+	return axios({ method: 'GET', url: SERVER_URL + `chatting/chattingRoom/messages${req.query}`, data: null, headers: req.header })
 }
 
 
@@ -76,7 +76,7 @@ export function getChattingMessagesByKeyword(req){
     // @Query("lastMessageCreatedDate") lastMessageCreatedDate: Long,
     // @Query("memberUUID") memberUUID: String,
     // @Header("Authorization") accessToken: String
-	return axios({ method: 'GET', url: SERVER_URL + `chatting/chattingRoom/message/search${req.query}`, data: req.data, headers: req.header })
+	return axios({ method: 'GET', url: SERVER_URL + `chatting/chattingRoom/message/search${req.query}`, data: null, headers: req.header })
 }
 
 /** 로그인 **/

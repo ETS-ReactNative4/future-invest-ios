@@ -9,6 +9,7 @@ export const AuthProvider = ({children}) => {
   const [actionName, setActionName] = useState("");
   const [objectChatRoom1, setObjectChatRoom1] = useState(null);
   const [objectStore, setObjectStore] = useState(null);
+  const [objectChattingRoomInfo, setObjectChattingRoomInfo]  = useState(null);
 
     // {
     //   "confirmed": false, 
@@ -35,6 +36,11 @@ export const AuthProvider = ({children}) => {
         setObjectStore,
         actionName,
         setActionName,
+        objectChatRoom1,
+        setObjectChatRoom1,
+        objectChattingRoomInfo,
+        setObjectChattingRoomInfo,
+
         login: async (email, password) => {
           // try {
           //   await auth().signInWithEmailAndPassword(email, password);
