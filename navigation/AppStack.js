@@ -145,11 +145,11 @@ const FeedStack = ({navigation}) => (
 
 const MessageStack = ({navigation}) => {
 
-  const {user, setUser, objectStore, setObjectStore} = useContext(AuthContext);
+  const {user, setUser, objectStore, setObjectStore,actionName, setActionName, objectChatRoom1
+    , setObjectChatRoom1} = useContext(AuthContext);
 
   return (
-  <Stack.Navigator 
-  
+  <Stack.Navigator
   // screenOptions={{
   //   headerShown: false
   // }}
@@ -187,7 +187,7 @@ const MessageStack = ({navigation}) => {
             <MessageIconLeftWrapper>
               <TouchableOpacity 
               onPress={()=> { 
-                navigation.goBack()
+                navigation.goBack();
               }}
               >
                 <Image source={require('../assets/chat/icon_chat_back0.png')} resizeMode={'contain'} style={{ width: 24, height: 24, marginLeft: 20, marginTop: 40 }}></Image>
@@ -201,6 +201,7 @@ const MessageStack = ({navigation}) => {
             <MessageIconRightWrapper>
               <TouchableOpacity 
               onPress={()=> { 
+                
                 
               }}
               >
@@ -223,110 +224,121 @@ const MessageStack = ({navigation}) => {
   </Stack.Navigator>
 )}
 
-const ProfileStack = ({navigation}) => (
+const ProfileStack = ({navigation}) => {
+
+  const {
+    user, setUser, 
+    objectStore, setObjectStore,
+    actionName, setActionName, 
+    objectChatRoom1, setObjectChatRoom1
+  } = useContext(AuthContext);
+
+  return (
+
   <Stack.Navigator>
-    <Stack.Screen
-      name="Profile"
-      component={ProfileScreen}
-      options={{
-        headerShown: false,
-      }}
-    />
-    <Stack.Screen
-      name="EditProfile"
-      component={EditProfileScreen}
-      options={{
-        
-        headerTitle: 'Edit Profile',
-        header: (props) => {
-          return (
-          <MessageHeader {...props} >
-            <MessageIconLeftWrapper>
-              <TouchableOpacity 
-              onPress={()=> { 
-                // navigation.goBack()
-                      navigation.navigate('Profile')
-              }}
-              >
-                <Image source={require('../assets/chat/icon_chat_back0.png')} resizeMode={'contain'} style={{ width: 24, height: 24, marginLeft: 20, marginTop: 40 }}></Image>
-              </TouchableOpacity>
-            </MessageIconLeftWrapper>
-            <MessageCenterWrapper>
-              <Text  style={{ width: "100%", height: 24,marginTop: 44, textAlign: 'center', color : "#303030",fontWeight: "bold", fontSize: 16  }}>
-                내 정보 관리
-              </Text>
-            </MessageCenterWrapper>
-          </MessageHeader>
-        )}
-      }}
-    />
+  <Stack.Screen
+    name="Profile"
+    component={ProfileScreen}
+    options={{
+      headerShown: false,
+    }}
+  />
+  <Stack.Screen
+    name="EditProfile"
+    component={EditProfileScreen}
+    options={{
+      
+      headerTitle: 'Edit Profile',
+      header: (props) => {
+        return (
+        <MessageHeader {...props} >
+          <MessageIconLeftWrapper>
+            <TouchableOpacity 
+            onPress={()=> { 
+              // navigation.goBack()
+              navigation.navigate('Profile')
+            }}
+            >
+              <Image source={require('../assets/chat/icon_chat_back0.png')} resizeMode={'contain'} style={{ width: 24, height: 24, marginLeft: 20, marginTop: 40 }}></Image>
+            </TouchableOpacity>
+          </MessageIconLeftWrapper>
+          <MessageCenterWrapper>
+            <Text  style={{ width: "100%", height: 24,marginTop: 44, textAlign: 'center', color : "#303030",fontWeight: "bold", fontSize: 16  }}>
+              내 정보 관리
+            </Text>
+          </MessageCenterWrapper>
+        </MessageHeader>
+      )}
+    }}
+  />
 
-    <Stack.Screen
-      name="EditProfileImageAndNicknameScreen"
-      component={EditProfileImageAndNicknameScreen}
-      options={{
-        headerTitle: 'Edit Profile',
-        header: (props) => {
-          return (
-          <MessageHeader {...props} >
-            <MessageIconLeftWrapper>
-              <TouchableOpacity 
-              onPress={()=> { 
-                // navigation.goBack()
-                      navigation.navigate('Profile')
-              }}
-              >
-                <Image source={require('../assets/chat/icon_chat_back0.png')} resizeMode={'contain'} style={{ width: 24, height: 24, marginLeft: 20, marginTop: 40 }}></Image>
-              </TouchableOpacity>
-            </MessageIconLeftWrapper>
-            <MessageCenterWrapper>
-              <Text  style={{ width: "100%", height: 24,marginTop: 44, textAlign: 'center', color : "#303030",fontWeight: "bold", fontSize: 16  }}>
-                프로필 편집
-              </Text>
-            </MessageCenterWrapper>
-            <MessageIconRightWrapper>
-              <TouchableOpacity 
-              onPress={()=> { 
-                console.log("clicked")
-              }}
-              >
-                <Text style={{  marginRight: 20, marginTop: 40, color: "#274ef7"  }}>저장</Text>
-              </TouchableOpacity>
-            </MessageIconRightWrapper>
-          </MessageHeader>
-        )}
-      }}></Stack.Screen>
+  <Stack.Screen
+    name="EditProfileImageAndNicknameScreen"
+    component={EditProfileImageAndNicknameScreen}
+    options={{
+      headerTitle: 'Edit Profile',
+      header: (props) => {
+        return (
+        <MessageHeader {...props} >
+          <MessageIconLeftWrapper>
+            <TouchableOpacity 
+            onPress={()=> { 
+              // navigation.goBack()
+                    navigation.navigate('Profile')
+            }}
+            >
+              <Image source={require('../assets/chat/icon_chat_back0.png')} resizeMode={'contain'} style={{ width: 24, height: 24, marginLeft: 20, marginTop: 40 }}></Image>
+            </TouchableOpacity>
+          </MessageIconLeftWrapper>
+          <MessageCenterWrapper>
+            <Text  style={{ width: "100%", height: 24,marginTop: 44, textAlign: 'center', color : "#303030",fontWeight: "bold", fontSize: 16  }}>
+              프로필 편집
+            </Text>
+          </MessageCenterWrapper>
+          <MessageIconRightWrapper>
+            <TouchableOpacity 
+            onPress={()=> { 
+              console.log("clicked")
+              setActionName("action/nickname-change")
+            }}
+            >
+              <Text style={{  marginRight: 20, marginTop: 40, color: "#274ef7"  }}>저장</Text>
+            </TouchableOpacity>
+          </MessageIconRightWrapper>
+        </MessageHeader>
+      )}
+    }}></Stack.Screen>
 
-    <Stack.Screen
-      name="EditProfileNotification"
-      component={EditProfileNotification}
-      options={{
-        headerTitle: '알림설정',
-        header: (props) => {
-          return (
-          <MessageHeader {...props} >
-            <MessageIconLeftWrapper>
-              <TouchableOpacity 
-              onPress={()=> { 
-                // navigation.goBack()
-                      navigation.navigate('Profile')
-              }}
-              >
-                <Image source={require('../assets/chat/icon_chat_back0.png')} resizeMode={'contain'} style={{ width: 24, height: 24, marginLeft: 20, marginTop: 40 }}></Image>
-              </TouchableOpacity>
-            </MessageIconLeftWrapper>
-            <MessageCenterWrapper>
-              <Text  style={{ width: "100%", height: 24,marginTop: 44, textAlign: 'center', color : "#303030",fontWeight: "bold", fontSize: 16  }}>
-                알림 설정
-              </Text>
-            </MessageCenterWrapper>
-          </MessageHeader>
-        )}
-      }}></Stack.Screen>
+  <Stack.Screen
+    name="EditProfileNotification"
+    component={EditProfileNotification}
+    options={{
+      headerTitle: '알림설정',
+      header: (props) => {
+        return (
+        <MessageHeader {...props} >
+          <MessageIconLeftWrapper>
+            <TouchableOpacity 
+            onPress={()=> { 
+              // navigation.goBack()
+                    navigation.navigate('Profile')
+            }}
+            >
+              <Image source={require('../assets/chat/icon_chat_back0.png')} resizeMode={'contain'} style={{ width: 24, height: 24, marginLeft: 20, marginTop: 40 }}></Image>
+            </TouchableOpacity>
+          </MessageIconLeftWrapper>
+          <MessageCenterWrapper>
+            <Text  style={{ width: "100%", height: 24,marginTop: 44, textAlign: 'center', color : "#303030",fontWeight: "bold", fontSize: 16  }}>
+              알림 설정
+            </Text>
+          </MessageCenterWrapper>
+        </MessageHeader>
+      )}
+    }}></Stack.Screen>
 
-  </Stack.Navigator>
-);
-
+</Stack.Navigator>
+  )
+}
 const AppStack = () => {
   console.log("AppStack")
   

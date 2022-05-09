@@ -21,7 +21,9 @@ const safeAreaHeight= Dimensions.get("window").height - getStatusBarHeight() - g
 
 
 const ChatScreen = () => {
-  const {user, setUser, objectStore, setObjectStore} = useContext(AuthContext);
+  const {user, setUser, objectStore, setObjectStore,  actionName,  setActionName} = useContext(AuthContext);
+
+  
   const [messages, setMessages] = useState([]);
   const [boolOpenSidebar, setBoolOpenSidebar] = useState(false);
   const [boolOpenToast, setBoolOpenToast] = useState(false);
@@ -32,6 +34,12 @@ const ChatScreen = () => {
     {_id: 2, avatar: "https://placeimg.com/140/140/any", name: "상담관리자"},
     {_id: 3, avatar: "https://placeimg.com/140/140/any", name: "닉네임최대아홉자요"},
   ]);
+
+  useEffect(()=> {
+    setActionName("");
+    __apiGetChattingMessages();
+  }, [])
+
 
   useEffect(() => {
     console.log("objectStore");

@@ -24,10 +24,80 @@ import * as FutureInvestApi from "../api/FutureInvestApi";
 
 
 const EditProfileScreen = () => {
-  const {user, logout} = useContext(AuthContext);
+  const {user, logout, actionName,  setActionName} = useContext(AuthContext);
 
   const [boolCheck1, setBoolCheck1] = useState(false);
   const [boolCheck2, setBoolCheck2] = useState(false);
+
+//   function __apiPutUpdateInfo(param1) {
+//     // if (param1 == null || param1 === undefined || typeof param1 === "undefined" || param1 == "") {
+//     //     return;
+//     // }
+//     // if (boolPossibleSubmit == true ) {
+//     // } else {
+
+//     //   return;
+//     // }
+
+//     DeviceInfo.getMacAddress().then((mac) => {
+//       // "E5:12:D8:E5:69:97"
+//       console.log(mac);
+      
+      
+
+//     var sendObject = {
+//       pwd:  textPassword,
+//       type : "GENERAL",
+//       name : textName,
+//       nickname : textNickname,
+//       phone : textPhone1 + textPhone2,
+//       macAddress : mac,
+//     }
+//     var formData1 = new FormData()
+    // formData1.append("memberUUID", user.uuid);
+
+//     if (textPassword != "" && textPassword == confirmPassword) {
+//       formData1.append("pwd", sendObject.pwd);
+//     }
+//     if (textName != "" && textNameError == "") {
+//       formData1.append("name", sendObject.name);
+//     }
+//     if (textPhone2 != "" && textPhone1Error == "") {
+//       formData1.append("phone", sendObject.phone);
+//     }
+//     const req = {
+//       data : sendObject,
+//       header: { 'Authorization': `Bearer ${user.memberTokenInfo.accessToken}`, }
+//     }
+
+//     FutureInvestApi.putChangeInfo(req)
+//     .then(res => {
+//       console.log("FutureInvestApi.signup")
+//       console.log(res)
+//       if (res.status < 300) {
+//         alert("수정되었습니다.");
+//         setUser(res.data)
+        
+//       }
+//       return 
+//     })
+//     .catch(e=>{
+//       // console.log('[CATCH]');
+//       console.log(e && e.response);
+//       alert("에러가 발생했습니다.")
+
+//     })
+
+//     })
+//     ;
+    
+
+// }
+
+  useEffect(()=> {
+
+    setActionName("");
+  }, [])
 
   return (
     <View style={styles.container}>

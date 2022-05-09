@@ -106,11 +106,13 @@ color : #cccccc;
 const MessagesScreen = ({navigation}) => {
   const [mode, setMode] = useState(0);
   const [arrayPageItems, setArrayPageItems] = useState([]);
-  const {user, setUser, login, googleLogin, fbLogin} = useContext(AuthContext);
+  const {user, setUser, login, googleLogin, fbLogin,  actionName,  setActionName, setObjectChatRoom1, objectChatRoom1} = useContext(AuthContext);
 
   useEffect(()=> {
     __apiGetChattingRooms();
+    setActionName("");
   },[])
+
 
 
   function __apiPOST1(param1) {
@@ -226,7 +228,32 @@ function __apiGetChattingRooms() {
       if (res.status < 300) {
         console.log("__apiGetChattingRooms - 2")
         console.log(res.data)
-        
+        // [
+        //   {
+        //     "chattingRoomId": 57,
+        //     "chattingRoomImageUrl": null,
+        //     "chattingRoomMemberCount": 0,
+        //     "chattingRoomStatus": "ACTIVITY",
+        //     "chattingRoomTitle": "ios_test_공개방",
+        //     "chattingRoomType": "PUBLIC",
+        //     "isReceiveNotification": true,
+        //     "lastMessageContent": "",
+        //     "lastMessageCreatedDate": null,
+        //     "unreadMessageCount": 0
+        //   },
+        //   {
+        //     "chattingRoomId": 58,
+        //     "chattingRoomImageUrl": null,
+        //     "chattingRoomMemberCount": 0,
+        //     "chattingRoomStatus": "ACTIVITY",
+        //     "chattingRoomTitle": "ios_test_비공개방",
+        //     "chattingRoomType": "PRIVATE",
+        //     "isReceiveNotification": true,
+        //     "lastMessageContent": "",
+        //     "lastMessageCreatedDate": null,
+        //     "unreadMessageCount": 0
+        //   }
+        // ]
         setArrayPageItems(res.data);
       }
     })
@@ -280,28 +307,31 @@ function __apiGetChattingRooms() {
             }
             keyExtractor={item=>item.id}
             renderItem={({item}) => (
-              <Card onPress={() => navigation.navigate('Chat', {userName: item.userName})}>
+              <Card onPress={() => {
+                // objectChatRoom1
+                  // setObjectChatRoom1
+                  navigation.navigate('Chat', {userName: item.userName})
+                }}>
                 <UserInfo>
                   <UserImgWrapper>
-                    <UserImg source={item.userImg} />
+                    <UserImg source={item.chattingRoomImageUrl} />
                   </UserImgWrapper>
                   <TextSection>
                     <UserInfoText>
                       <UserName>
                         {/* {item.userName} */}
-                        Type {item.type}
+                        Type {item.chattingRoomType}
                         </UserName>
                       {/* <PostTime>
                         {item.messageTime}
                         </PostTime> */}
                     </UserInfoText>
                     <MessageText>
-                      {/* {item.messageText} */}
-                      마지막 메시지가 표시됩니다. 마지막 ...
+                      {item.lastMessageContent}
                       </MessageText>
                   </TextSection>
                   <TextNumber>
-                    11
+                    {item.unreadMessageCount}
                   </TextNumber>
                 </UserInfo>
               </Card>

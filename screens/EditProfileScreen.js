@@ -15,6 +15,11 @@ const device_width = Dimensions.get('window').width;
 const device_height = Dimensions.get('window').height;
 
 const SignupScreen = ({navigation}) => {
+
+  const {user, setUser, objectStore, setObjectStore, logout,  actionName,  setActionName} = useContext(AuthContext);
+  const [loading, setLoading] = useState(true);
+  const [userData, setUserData] = useState(null);
+  
   const [id, setId] = useState("");
   const [idError, setIdError] =  useState("check-need");
   const [textNickname, setTextNickname] = useState("");
@@ -31,7 +36,42 @@ const SignupScreen = ({navigation}) => {
   const [confirmPasswordError, setConfirmPasswordError] = useState("check-need");
   const [boolPossibleSubmit, setBoolPossibleSubmit] = useState(false);
 
-  const {register} = useContext(AuthContext);
+  const [idOrigin, setIdOrigin] = useState("");
+  const [textNameOrigin, setTextNameOrigin] = useState("");
+  const [textNicknameOrigin, setTextNicknameOrigin] = useState("");
+  const [textPhoneOrigin, setTextPhoneOrigin] = useState("010");
+  const [textPasswordOrigin, setTextPasswordOrigin] = useState("");
+
+
+  useEffect(()=> {
+    setId(user.id)
+    setTextName(user.name)
+    setTextPhone1("010")
+    setTextPhone2(user.phone.substring(3))
+
+    setIdOrigin(user.id)
+    setTextNameOrigin(user.name)
+    setTextPhoneOrigin(user.phone);
+
+
+
+    // {
+    //   "confirmed": false, 
+    //   "id": "test1", 
+    //   "imageUrl": null, 
+    //   "memberTokenInfo": {
+    //      "accessToken": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImV4cCI6MTY1MjEwOTE5MH0.pPK2PYw8xP_zogCMiMbmO3WwKTHigQ84PER5EZbYNC9mjstCuX9sVu78nfqx0lARe5nf4_udVE0OQ0CBkpws3w", 
+    //      "refreshToken": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImV4cCI6MTY1ODI0MzU5MH0.UHKdll2FvExR5pgrIwtZuccZ_Wgcizp8c7pvtoOhxd99REySkgJj1cUvBhm6VmvmvVfqmTQ50fLw2Bz6N39_FA"
+    // }, 
+    //   "memberType": "GENERAL", 
+    //   "messageNotificationReceive": true, 
+    //   "name": "name11", 
+    //   "nickname": "test1", 
+    //   "phone": "01030913971", 
+    //   "replyMessageNotificationReceive": true,
+    //   "uuid": "c91fb122-64"
+    // }
+  }, [])
 
   useEffect(() => {
     if (textPassword >=4 && textPassword < 9) {
@@ -57,18 +97,20 @@ const SignupScreen = ({navigation}) => {
 
   useEffect(() => {
 
-    if (
-      id == "" || 
-      textName == "" || 
-      textPhone1 == "" || 
-      textPhone2 == "" || 
-      textPassword == "" || 
-      confirmPassword == "" || 
-      textPassword != confirmPassword
-    ) {
-      setBoolPossibleSubmit(false);
-      return;
-    }
+    // if (
+    //   id == "" || 
+    //   textName == "" || 
+    //   textPhone1 == "" || 
+    //   textPhone2 == "" || 
+    //   textPassword == "" || 
+    //   confirmPassword == "" || 
+    //   textPassword != confirmPassword
+    // ) {
+    //   setBoolPossibleSubmit(false);
+    //   return;
+    // }
+
+
 
     if (
       idError == "check-need" &&
@@ -110,6 +152,12 @@ const SignupScreen = ({navigation}) => {
 
 
   function __apiCheckOverlapId() {
+
+    if (id == idOrigin) {
+      setIdError("기존 ID와 같습니다.")
+      return;
+    }
+
     //checkOverlapId
     const req = {
       query : `?id=${id}` ,
@@ -142,6 +190,12 @@ const SignupScreen = ({navigation}) => {
     })
   }
   function __apiCheckOverlapNickname() {
+
+    if (textNickname == textNicknameOrigin) {
+      setTextNameError("기존 값과 같습니다.")
+      return;
+    }
+
     //checkOverlapNickname
     const req = {
       query : `?nickname=${textNickname}` ,
@@ -171,6 +225,12 @@ const SignupScreen = ({navigation}) => {
 
 
   function __apiCheckOverlapPhone() {
+
+    if ((textPhone1 + textPhone2) == textPhoneOrigin) {
+      setTextPhone1Error("기존 값과 같습니다.")
+      return;
+    }
+
     const req = {
       query : `?phone=${textPhone1 + "" + textPhone2}`,
       header: { 'Authorization': "Basic ZnV0dXJlaW52ZXN0OmZ1dHVyZXBhc3N3b3Jk", } 
@@ -202,26 +262,23 @@ const SignupScreen = ({navigation}) => {
 
   }
 
-  function __apiPostRegister(param1) {
+  function __apiPutUpdateInfo(param1) {
     // if (param1 == null || param1 === undefined || typeof param1 === "undefined" || param1 == "") {
     //     return;
+    // }
+    // if (boolPossibleSubmit == true ) {
+    // } else {
+
+    //   return;
     // }
 
     DeviceInfo.getMacAddress().then((mac) => {
       // "E5:12:D8:E5:69:97"
       console.log(mac);
-
+      
+      
 
     var sendObject = {
-          
-          // var id: String,
-          // var pwd: String,
-          // var type: MemberType?,
-          // var name: String,
-          // var nickname: String,
-          // var phone: String,
-          // var macAddress: String
-      id : id,
       pwd:  textPassword,
       type : "GENERAL",
       name : textName,
@@ -230,25 +287,30 @@ const SignupScreen = ({navigation}) => {
       macAddress : mac,
     }
     var formData1 = new FormData()
-    formData1.append("id", sendObject.id);
-    formData1.append("pwd", sendObject.pwd);
-    formData1.append("type", sendObject.type);
-    formData1.append("name", sendObject.name);
-    formData1.append("nickname", sendObject.nickname);
-    formData1.append("phone", sendObject.phone);
-    formData1.append("macAddress", sendObject.macAddress);
+    formData1.append("memberUUID", user.uuid);
+
+    if (textPassword != "" && textPassword == confirmPassword) {
+      formData1.append("pwd", sendObject.pwd);
+    }
+    if (textName != "" && textNameError == "") {
+      formData1.append("name", sendObject.name);
+    }
+    if (textPhone2 != "" && textPhone1Error == "") {
+      formData1.append("phone", sendObject.phone);
+    }
     const req = {
-      data : sendObject
+      data : sendObject,
+      header: { 'Authorization': `Bearer ${user.memberTokenInfo.accessToken}`, }
     }
 
-    FutureInvestApi.signup(req)
+    FutureInvestApi.putChangeInfo(req)
     .then(res => {
       console.log("FutureInvestApi.signup")
       console.log(res)
       if (res.status < 300) {
-        alert("가입되었습니다.");
+        alert("수정되었습니다.");
+        setUser(res.data)
         
-        navigation.navigate('Login');
       }
       return 
     })
@@ -264,8 +326,6 @@ const SignupScreen = ({navigation}) => {
     
 
 }
-
-
 
   return (
     <ScrollView style={styles.scrollview}>
@@ -368,7 +428,9 @@ const SignupScreen = ({navigation}) => {
         style={boolPossibleSubmit == true ? styles.navButtonActive : styles.navButton}
         onPress={() => {
           // navigation.navigate('Login')
-          __apiPostRegister();
+          // __apiPutUpdateInfo();
+
+          __apiPutUpdateInfo()
         }}
         >
         <Text style={boolPossibleSubmit == true ? styles.navButtonActiveText : styles.navButtonText}>

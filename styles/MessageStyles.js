@@ -21,6 +21,18 @@ export const UserImgWrapper = styled.View`
   padding-top: 15px;
   padding-bottom: 15px;
   margin-right: 20px;
+  background-color: #aeaeae;
+
+  max-width: 50px;
+  max-height: 50px;
+  min-width: 50px;
+  min-height: 50px;
+  border-radius: 25px;
+  overflow: hidden;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 export const UserImg = styled.Image`

@@ -27,9 +27,10 @@ const ProfileScreen = ({navigation, route}) => {
     const req = {
       // data : sendObject,
       query: `?memberUUID=${user.uuid}`,
-      header: { 'Authorization': `Bearer ${user.memberTokenInfo.accessToken}`, }
+      header: { 
+        'Authorization': `Bearer ${user.memberTokenInfo.accessToken}`,
+      }
     }
-
     FutureInvestApi.logout(req)
     .then(res => {
       console.log("FutureInvestApi.logout")
@@ -161,8 +162,11 @@ function __apiPostWithdrawal(param1) {
               navigation.navigate('EditProfileImageAndNicknameScreen',)
             }} 
           >
-            <Text style={styles.top1_text1}>수정하기</Text>
-            <Image style={styles.top1_image1} 
+            <Text style={styles.top1_text1}>
+              수정하기
+              </Text>
+            <Image 
+              style={styles.top1_image1} 
               source={
               require('../assets/chat/icon_profile_pencil.png')
             } 
@@ -174,7 +178,7 @@ function __apiPostWithdrawal(param1) {
               source={{uri: userData ? userData.userImg || 'https://lh5.googleusercontent.com/-b0PKyNuQv5s/AAAAAAAAAAI/AAAAAAAAAAA/AMZuuclxAM4M1SCBGAO7Rp-QP6zgBEUkOQ/s96-c/photo.jpg' : 'https://lh5.googleusercontent.com/-b0PKyNuQv5s/AAAAAAAAAAI/AAAAAAAAAAA/AMZuuclxAM4M1SCBGAO7Rp-QP6zgBEUkOQ/s96-c/photo.jpg'}}
             />
             <Text style={styles.userName}>
-              한국매일증권
+              {user && user.nickname ? user.nickname : ""}
               {/* {userData ? userData.fname || 'Test' : 'Test'} {userData ? userData.lname || 'User' : 'User'} */}
             </Text>
             {/* <Text>{route.params ? route.params.userId : user.uid}</Text> */}

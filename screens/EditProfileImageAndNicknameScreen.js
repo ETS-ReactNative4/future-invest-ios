@@ -10,12 +10,6 @@ import {
   Image,
 } from 'react-native';
 
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import Feather from 'react-native-vector-icons/Feather';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import FormButton from '../components/FormButton';
-
 import Animated from 'react-native-reanimated';
 import BottomSheet from 'reanimated-bottom-sheet';
 import ImagePicker from 'react-native-image-crop-picker';
@@ -28,13 +22,11 @@ import FormInputWithDuplCheck from  '../components/FormInputWithDuplCheck';
 import { windowWidth } from '../utils/Dimentions';
 
 import DeviceInfo from 'react-native-device-info'; 
-
 import * as BaseApi from "../api/BaseApi";
 import * as FutureInvestApi from "../api/FutureInvestApi";
 
-
 const EditProfileScreen = () => {
-  const {user, logout} = useContext(AuthContext);
+  const {user, logout, actionName, setActionName} = useContext(AuthContext);
   const [image, setImage] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [transferred, setTransferred] = useState(0);
@@ -42,46 +34,6 @@ const EditProfileScreen = () => {
   const [textNickname, setTextNickname] = useState("");
   const [textNicknameError, setTextNicknameError] =  useState("check-need");
 
-  const getUser = async() => {
-    const currentUser = await firestore()
-    .collection('users')
-    .doc(user.uid)
-    .get()
-    .then((documentSnapshot) => {
-      if( documentSnapshot.exists ) {
-        console.log('User Data', documentSnapshot.data());
-        setUserData(documentSnapshot.data());
-      }
-    })
-  }
-
-  const handleUpdate = async() => {
-    let imgUrl = await uploadImage();
-
-    if( imgUrl == null && userData.userImg ) {
-      imgUrl = userData.userImg;
-    }
-
-    firestore()
-    .collection('users')
-    .doc(user.uid)
-    .update({
-      fname: userData.fname,
-      lname: userData.lname,
-      about: userData.about,
-      phone: userData.phone,
-      country: userData.country,
-      city: userData.city,
-      userImg: imgUrl,
-    })
-    .then(() => {
-      console.log('User Updated!');
-      Alert.alert(
-        'Profile Updated!',
-        'Your profile has been updated successfully.'
-      );
-    })
-  }
 
   const uploadImage = async () => {
     if( image == null ) {
@@ -95,47 +47,19 @@ const EditProfileScreen = () => {
     const name = filename.split('.').slice(0, -1).join('.');
     filename = name + Date.now() + '.' + extension;
 
-    setUploading(true);
-    setTransferred(0);
-
-    const storageRef = storage().ref(`photos/${filename}`);
-    const task = storageRef.putFile(uploadUri);
-
-    // Set transferred state
-    task.on('state_changed', (taskSnapshot) => {
-      console.log(
-        `${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`,
-      );
-
-      setTransferred(
-        Math.round(taskSnapshot.bytesTransferred / taskSnapshot.totalBytes) *
-          100,
-      );
-    });
-
-    try {
-      await task;
-
-      const url = await storageRef.getDownloadURL();
-
-      setUploading(false);
-      setImage(null);
-
-      // Alert.alert(
-      //   'Image uploaded!',
-      //   'Your image has been uploaded to the Firebase Cloud Storage Successfully!',
-      // );
-      return url;
-
-    } catch (e) {
-      console.log(e);
-      return null;
-    }
-
+    // uploadUri
+    __apiPutUpdateImage(uploadUri)
   };
 
+  useEffect(()=> {
+    console.log("page :::", actionName);
+    __apiCheckOverlapNickname(true);
+    setActionName("");
+  },[actionName])
+
   useEffect(() => {
-    getUser();
+    setTextNickname(user.nickname);
+    setActionName("");
   }, []);
 
   const takePhotoFromCamera = () => {
@@ -201,8 +125,102 @@ const EditProfileScreen = () => {
   bs = React.createRef();
   fall = new Animated.Value(1);
 
+  function __apiPutUpdateNickname(param1) {
+    // if (param1 == null || param1 === undefined || typeof param1 === "undefined" || param1 == "") {
+    //     return;
+    // }
+    // if (boolPossibleSubmit == true ) {
+    // } else {
 
-  function __apiCheckOverlapNickname() {
+    //   return;
+    // }
+
+    var sendObject = {
+      nickname : textNickname,
+    }
+    var formData1 = new FormData()
+    formData1.append("memberUUID", user.uuid);
+    if (textNickname != "" && textNickname == "") {
+      formData1.append("nickname", sendObject.nickname);
+    }
+    const req = {
+      data : formData1,
+      header: { 'Authorization': `Bearer ${user.memberTokenInfo.accessToken}`, },
+      query: `?memberUUID=${user.uuid}`
+    }
+
+    FutureInvestApi.updateChangeNickname(req)
+    .then(res => {
+      console.log("FutureInvestApi.signup")
+      console.log(res)
+      if (res.status < 300) {
+        alert("수정되었습니다.");
+        setUser(res.data)
+        
+      }
+      return 
+    })
+    .catch(e=>{
+      // console.log('[CATCH]');
+      console.log(e && e.response);
+      alert("에러가 발생했습니다.")
+
+    })
+
+  }
+
+
+  function __apiPutUpdateImage(param1) {
+    // if (param1 == null || param1 === undefined || typeof param1 === "undefined" || param1 == "") {
+    //     return;
+    // }
+    // if (boolPossibleSubmit == true ) {
+    // } else {
+
+    //   return;
+    // }
+
+    if (image != null) {
+    } else {
+
+      return;
+    }
+
+    var sendObject = {
+      file : image,
+    }
+    var formData1 = new FormData()
+    formData1.append("memberUUID", user.uuid);
+    if (image ) {
+      formData1.append("file", sendObject.file);
+    }
+    const req = {
+      data : formData1,
+      header: { 'Authorization': `Bearer ${user.memberTokenInfo.accessToken}`, },
+      query: `?memberUUID=${user.uuid}`
+    }
+
+    FutureInvestApi.updateChangeImage(req)
+    .then(res => {
+      console.log("FutureInvestApi.signup")
+      console.log(res)
+      if (res.status < 300) {
+        alert("수정되었습니다.");
+        setUser(res.data)
+      }
+      return 
+    })
+    .catch(e=>{
+      // console.log('[CATCH]');
+      console.log(e && e.response);
+      alert("에러가 발생했습니다.")
+
+    })
+
+  }
+
+
+  function __apiCheckOverlapNickname(param1) {
     //checkOverlapNickname
     const req = {
       query : `?nickname=${textNickname}` 
@@ -213,6 +231,9 @@ const EditProfileScreen = () => {
       if (res.status < 300) {
         if (res.data == false) {
           setTextNicknameError("");
+          if (param1 == true) {
+            __apiPutUpdateNickname();
+          }
         } else {
           setTextNicknameError("사용할 수 없습니다");
         }
@@ -277,19 +298,6 @@ const EditProfileScreen = () => {
                     justifyContent: 'center',
                     alignItems: 'center',
                   }}>
-                  {/* <MaterialCommunityIcons
-                    name="camera"
-                    size={35}
-                    color="#fff"
-                    style={{
-                      opacity: 0.7,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      borderWidth: 1,
-                      borderColor: '#fff',
-                      borderRadius: 10,
-                    }}
-                  /> */}
                 </View>
               </ImageBackground>
             <TouchableOpacity
@@ -303,9 +311,7 @@ const EditProfileScreen = () => {
             </View>
           </TouchableOpacity>
           <Text style={{marginTop: 10, fontSize: 18, fontWeight: 'bold'}}>
-            {userData ? userData.fname : ''} {userData ? userData.lname : ''}
           </Text>
-          {/* <Text>{user.uid}</Text> */}
         </View>
         <FormInputWithDuplCheck
             labelText={'닉네임'}
@@ -383,14 +389,15 @@ const styles = StyleSheet.create({
   panelButton: {
     padding: 13,
     borderRadius: 10,
-    backgroundColor: '#2e64e5',
+    color : '#000',
+    backgroundColor: '#fceb39',
     alignItems: 'center',
     marginVertical: 7,
   },
   panelButtonTitle: {
     fontSize: 17,
     fontWeight: 'bold',
-    color: 'white',
+    color: '#3c1e1e',
   },
   action: {
     flexDirection: 'row',

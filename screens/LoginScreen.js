@@ -55,15 +55,15 @@ const LoginScreen = ({navigation}) => {
     FutureInvestApi.login(req)
     .then(res => {
 
-      // console.log("FutureInvestApi.login - 0")
-      // console.log(res)
+      console.log("FutureInvestApi.login - 0")
+      console.log(res)
       if (res.status < 300) {
 
         console.log("FutureInvestApi.login - 1")
         console.log(res.data)
         // TEMP
         // setBoolPermissionPopup(false)
-        setUser(res.data)
+        setUser(res.data);
 
         // LOGIN RESPONSE (res.data)
         // {
@@ -80,12 +80,12 @@ const LoginScreen = ({navigation}) => {
         //   "uuid": "c91fb122-64"
         // }
       } else {
-        alert("회원정보를 확인해주세요!")
+        alert("회원정보를 확인해주세요!");
       }
     })
     .catch(e=>{
         // console.log('[CATCH]');
-        // console.log(e && e.response);
+        console.log(e && e.response);
         alert("회원정보를 확인해주세요.")
 
     })

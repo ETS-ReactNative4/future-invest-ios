@@ -6,6 +6,8 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({children}) => {
   const [user, setUser] = useState(null);
+  const [actionName, setActionName] = useState("");
+  const [objectChatRoom1, setObjectChatRoom1] = useState(null);
   const [objectStore, setObjectStore] = useState(null);
 
     // {
@@ -31,6 +33,8 @@ export const AuthProvider = ({children}) => {
         setUser,
         objectStore,
         setObjectStore,
+        actionName,
+        setActionName,
         login: async (email, password) => {
           // try {
           //   await auth().signInWithEmailAndPassword(email, password);

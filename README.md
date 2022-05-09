@@ -81,6 +81,7 @@ Basic YWxiYW5vdGVfaWRfYmxhYzphbGJhbm90ZV9wd2RfMjAxMw==
 /login
 해당 요청에는 Basic Token 넣어주시면 될거같습니다.
 
+## 아이디 alalal  비밀번호 121212 
 
 # MessagesScreen => 채팅 목록(채팅방 목록)
 # ChatScreen => 채팅 방 안의 메시지 목록
@@ -112,10 +113,6 @@ Clean Android project? (Y/n) Y
 Wipe node_modules folder? (Y/n) Y
 Update brew? (Y/n) Y
 
-
-
-
-
 // https://yannichoongs.tistory.com/192
 // yannichoongs.tistory.com/195
 // https://velog.io/@mementomori/React-Native-Chatting-구현
@@ -138,3 +135,6 @@ Update brew? (Y/n) Y
 //   pending?: boolean
 //   quickReplies?: QuickReplies
 // }
+
+
+https://aboutreact.com/file-uploading-in-react-native/
