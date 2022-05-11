@@ -265,7 +265,7 @@ FutureInvestApi.updateFcmToken(req)
           아이디와 비밀번호가 일치하지 않습니다.
         </Text>
       }
-      <TouchableOpacity
+      {/* <TouchableOpacity
         style={styles.autoLoginRow}
         onPress={() =>{
           setBoolAutoLogin(!boolAutoLogin);
@@ -280,7 +280,7 @@ FutureInvestApi.updateFcmToken(req)
         <Text style={styles.navButtonText}>
           자동 로그인하기
         </Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
 
       <FormButton
         buttonTitle="로그인"

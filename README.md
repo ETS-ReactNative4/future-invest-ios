@@ -138,3 +138,25 @@ Update brew? (Y/n) Y
 
 
 https://aboutreact.com/file-uploading-in-react-native/
+
+
+The main thing that seems to have worked is to use the GUI to create a new AssetCatalog, then reference the images again. Not to be confused with using the current asset catalogue and uploading the images again. That didn' work for me.
+
+Other things that I tried and am not sure if they helped are the following:
+
+I moved the AssetCatalog.xcassets folder from its location under the Resources folder to a level up i.e. the root iOS PCL folder
+In addition to the above, I changed the reference in the info.plists that reference this folder to reference the correct location i.e. I removed the directory "Resources" in front of the refrerence.
+I removed the following lines in the info.plists:
+
+
+
+## api 소통으로 이해 + 추가 소통 나눈 내용 (핵심)
+로그인 정책은 단일기기 로그인
+macAddress -> 로그인 유효성 체크 (splashView, android) -> splashViewModel 초기 로그인 체크
+
+채팅목록 관련 api
+1) GET 목록
+2) 갱신 (새로운 메시지 왔을 때), push 오면 갱신
+
+채팅방에 들어갔을때는 socket으로
+
