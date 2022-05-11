@@ -1,4 +1,4 @@
-import React, {useContext,  useState, useEffect, useCallback, useRef} from 'react';
+import React, {useContext,  useState, useEffect, useCallback, useRef, useLayoutEffect} from 'react';
 import {View, ScrollView, Text, Button, StyleSheet, Image, Modal, TouchableOpacity, Dimensions} from 'react-native';
 import {Bubble, GiftedChat, Send, InputToolbar} from 'react-native-gifted-chat';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -21,7 +21,7 @@ import * as SockJS from "sockjs-client";
 
 const safeAreaHeight= Dimensions.get("window").height - getStatusBarHeight() - getBottomSpace();
 
-
+/// https://reactnative.dev/docs/appstate
 const ChatScreen = () => {
   const {
       user, setUser, 
@@ -32,6 +32,9 @@ const ChatScreen = () => {
 
     } = useContext(AuthContext);
 
+    const appState = useRef(AppState.currentState);
+    const [appStateVisible, setAppStateVisible] = useState(appState.current);
+  
     const client = useRef({});
 
   const [messages, setMessages] = useState([]);
@@ -55,10 +58,31 @@ const ChatScreen = () => {
 
   },[objectStore]);
   
+//   그럼 useEffect는 React life cycle 중 componentDidMount에만 해당될까요?
+// 아닙니다. 정확히는 componentDidMount와 componentDidUpdate, componentWillUnmount를 합쳐놓은 것에 해당됩니다.
+
   useEffect(() => {
     connect();
+    const subscription = AppState.addEventListener("change", nextAppState => {
+      if (
+        appState.current.match(/inactive|background/) &&
+        nextAppState === "active"
+      ) {
+        console.log("App has come to the foreground!");
 
-    return () => disconnect();
+        // 안드로이드 기준 onResume
+      }
+
+      appState.current = nextAppState;
+      setAppStateVisible(appState.current);
+      console.log("AppState", appState.current);
+    });
+
+    return () => {
+      subscription.remove();
+      disconnect();
+    };
+
   }, []);
 
   const connect = () => {
@@ -88,29 +112,47 @@ const ChatScreen = () => {
     client.current.deactivate();
   };
 
+  useLayoutEffect(() => {
+    return () => {
+        // Your code here. - ComponentWillUnmount
+    }
+}, [])
+
+
   const subscribe = () => {
     client.current.subscribe(`/topic/chatting/pub/newMessage/private/${objectChatRoom1}`, ({ body }) => {
+
+      console.log("/topic/chatting/pub/newMessage/private/ - body", body)
       setChatMessages((_chatMessages) => [..._chatMessages, JSON.parse(body)]);
     });
     client.current.subscribe(`/topic/chatting/pub/newMessage/public/${objectChatRoom1}`, ({ body }) => {
+
+      console.log("/topic/chatting/pub/newMessage/public/ - body", body)
       setChatMessages((_chatMessages) => [..._chatMessages, JSON.parse(body)]);
     });
     client.current.subscribe(`/topic/chatting/pub/disconnect/${objectChatRoom1}`, ({ body }) => {
+
+      console.log("/topic/chatting/pub/disconnect/ - body", body)
       setChatMessages((_chatMessages) => [..._chatMessages, JSON.parse(body)]);
     });
     client.current.subscribe(`/topic/chatting/sub/member/newMessage/${objectChatRoom1}`, ({ body }) => {
+      console.log("/topic/chatting/sub/member/newMessage/ - body", body)
       setChatMessages((_chatMessages) => [..._chatMessages, JSON.parse(body)]);
     });
     client.current.subscribe(`/topic/chatting/sub/member/newMessage/${objectChatRoom1}/${user.uuid}`, ({ body }) => {
+      console.log("/topic/chatting/sub/member/newMessage/ - body", body)
       setChatMessages((_chatMessages) => [..._chatMessages, JSON.parse(body)]);
     });
     client.current.subscribe(`/topic/chatting/sub/removeMessage/${objectChatRoom1}`, ({ body }) => {
+      console.log("/topic/chatting/sub/removeMessage/ - body", body)
       setChatMessages((_chatMessages) => [..._chatMessages, JSON.parse(body)]);
     });
     client.current.subscribe(`/topic/chatting/sub/admin/newMembers/${objectChatRoom1}`, ({ body }) => {
+      console.log("/topic/chatting/sub/admin/newMembers/ - body", body)
       setChatMessages((_chatMessages) => [..._chatMessages, JSON.parse(body)]);
     });
     client.current.subscribe(`/topic/chatting/sub/newInform/${objectChatRoom1}`, ({ body }) => {
+      console.log("/topic/chatting/sub/newInform/ - body", body)
       setChatMessages((_chatMessages) => [..._chatMessages, JSON.parse(body)]);
     });
   };
