@@ -160,3 +160,4 @@ macAddress -> 로그인 유효성 체크 (splashView, android) -> splashViewMode
 
 채팅방에 들어갔을때는 socket으로
 
+~

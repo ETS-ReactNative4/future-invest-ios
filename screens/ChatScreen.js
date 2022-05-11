@@ -1,4 +1,4 @@
-import React, {useContext,  useState, useEffect, useCallback} from 'react';
+import React, {useContext,  useState, useEffect, useCallback, useRef} from 'react';
 import {View, ScrollView, Text, Button, StyleSheet, Image, Modal, TouchableOpacity, Dimensions} from 'react-native';
 import {Bubble, GiftedChat, Send, InputToolbar} from 'react-native-gifted-chat';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -12,9 +12,11 @@ import { FlatList } from 'react-native-gesture-handler';
 
 import DeviceInfo from 'react-native-device-info'; 
 
+import {WS_SERVER_URL} from "../api/index";
 import * as BaseApi from "../api/BaseApi";
 import * as FutureInvestApi from "../api/FutureInvestApi";
-
+import * as StompJs from "@stomp/stompjs";
+import * as SockJS from "sockjs-client";
 
 
 const safeAreaHeight= Dimensions.get("window").height - getStatusBarHeight() - getBottomSpace();
@@ -30,6 +32,7 @@ const ChatScreen = () => {
 
     } = useContext(AuthContext);
 
+    const client = useRef({});
 
   const [messages, setMessages] = useState([]);
   const [boolOpenSidebar, setBoolOpenSidebar] = useState(false);
@@ -43,31 +46,102 @@ const ChatScreen = () => {
   ]);
 
 
-  useEffect(()=> {
-    setActionName("");
-    __apiGetChattingRoomInitData(objectChatRoom1);
-    // __apiGetChattingMessages(objectChatRoom1);
-  }, [])
-
-
   useEffect(() => {
-    console.log("ChatScreen objectStore");
-    console.log(objectStore);
-    console.log("ChatScreen objectChatRoom1");
-    console.log(objectChatRoom1);
-
+    console.log("ChatScreen objectStore", objectStore);
+    console.log("ChatScreen objectChatRoom1", objectChatRoom1);
     if (objectStore && objectStore.type && objectStore.type == "popup") {
       setBoolOpenSidebar(true);
     }
 
   },[objectStore]);
+  
+  useEffect(() => {
+    connect();
+
+    return () => disconnect();
+  }, []);
+
+  const connect = () => {
+    client.current = new StompJs.Client({
+      // brokerURL: "ws://localhost:8080/ws-stomp/websocket", // 웹소켓 서버로 직접 접속
+      webSocketFactory: () => new SockJS(WS_SERVER_URL), // proxy를 통한 접속
+      connectHeaders: {
+        "Authorization": `Bearer ${user.memberTokenInfo.accessToken}`,
+      },
+      debug: function (str) {
+        console.log(str);
+      },
+      reconnectDelay: 5000,
+      heartbeatIncoming: 4000,
+      heartbeatOutgoing: 4000,
+      onConnect: () => {
+        subscribe();
+      },
+      onStompError: (frame) => {
+        console.error(frame);
+      },
+    });
+    client.current.activate();
+  };
+
+  const disconnect = () => {
+    client.current.deactivate();
+  };
+
+  const subscribe = () => {
+    client.current.subscribe(`/topic/chatting/pub/newMessage/private/${objectChatRoom1}`, ({ body }) => {
+      setChatMessages((_chatMessages) => [..._chatMessages, JSON.parse(body)]);
+    });
+    client.current.subscribe(`/topic/chatting/pub/newMessage/public/${objectChatRoom1}`, ({ body }) => {
+      setChatMessages((_chatMessages) => [..._chatMessages, JSON.parse(body)]);
+    });
+    client.current.subscribe(`/topic/chatting/pub/disconnect/${objectChatRoom1}`, ({ body }) => {
+      setChatMessages((_chatMessages) => [..._chatMessages, JSON.parse(body)]);
+    });
+    client.current.subscribe(`/topic/chatting/sub/member/newMessage/${objectChatRoom1}`, ({ body }) => {
+      setChatMessages((_chatMessages) => [..._chatMessages, JSON.parse(body)]);
+    });
+    client.current.subscribe(`/topic/chatting/sub/member/newMessage/${objectChatRoom1}/${user.uuid}`, ({ body }) => {
+      setChatMessages((_chatMessages) => [..._chatMessages, JSON.parse(body)]);
+    });
+    client.current.subscribe(`/topic/chatting/sub/removeMessage/${objectChatRoom1}`, ({ body }) => {
+      setChatMessages((_chatMessages) => [..._chatMessages, JSON.parse(body)]);
+    });
+    client.current.subscribe(`/topic/chatting/sub/admin/newMembers/${objectChatRoom1}`, ({ body }) => {
+      setChatMessages((_chatMessages) => [..._chatMessages, JSON.parse(body)]);
+    });
+    client.current.subscribe(`/topic/chatting/sub/newInform/${objectChatRoom1}`, ({ body }) => {
+      setChatMessages((_chatMessages) => [..._chatMessages, JSON.parse(body)]);
+    });
+  };
+
+  const publish = (message) => {
+    if (!client.current.connected) {
+      return;
+    }
+
+    client.current.publish({
+      destination: "/pub/chat",
+      body: JSON.stringify({ roomSeq: objectChatRoom1, message }),
+    });
+
+    setMessage("");
+  };
+
+  useEffect(()=> {
+    setActionName("");
+
+    console.log("objectChatRoom1.chattingRoomId", objectChatRoom1.chattingRoomId)
+    __apiGetChattingRoomInitData(objectChatRoom1);
+    // __apiGetChattingMessages(objectChatRoom1);
+  }, [])
+
 
 
   useEffect(() => {
     if (boolOpenToast == "true") {
       // 몇초 뒤 종료/ Hide
     }
-
   },[boolOpenToast]);
 
 
@@ -104,9 +178,9 @@ const ChatScreen = () => {
 
       if (res.status < 300) {
         console.log("__apiGetChattingRoomInitData - 2")
-        console.log(res.data)
+        // console.log(res.data)
         setObjectChattingRoomInfo(res.data);
-        setMessages(res.data.chattingRoomMessages)
+        // setMessages(res.data.chattingRoomMessages)
 
         // {"chattingRoomInform": null, 
         // "chattingRoomMembers": [
@@ -532,31 +606,6 @@ function __apiPutUpdateChattingRoomNotification(param1) {
               { zIndex: 99, },
             ]}
            >
-             {/* top HEADER 
-             
-             
-        // {"chattingRoomInform": null, 
-        // "chattingRoomMembers": [
-      //       {"memberImageUrl": null, 
-      //       "memberLastAccessDate": null, 
-      //       "memberName": "asd", 
-      //       "memberNickname": "test2", 
-      //       "memberType": "GENERAL", 
-      //       "memberUUID": "dffb3741-27"
-      //     }, 
-      //     {"memberImageUrl": null, 
-      //     "memberLastAccessDate": null, 
-      //     "memberName": "ios_test", 
-      //     "memberNickname": "ios_test",
-      //      "memberType": "MANAGER", 
-      //      "memberUUID": "7afe18d4-ac"
-      //     }
-      //   ], 
-      //   "chattingRoomMessages": [], 
-      //   "chattingRoomTitle": "ios_test_공개방", 
-      //   "chattingRoomType": "PUBLIC", 
-      //   "isNotificationReceive": true
-      // }*/}
 
              <View style={[styles.sidebarTop1, ]}>
                 <Text style={styles.sidebarTop1_Text1}>참여자 리스트</Text>
@@ -594,7 +643,7 @@ function __apiPutUpdateChattingRoomNotification(param1) {
               objectChattingRoomInfo.chattingRoomMembers && 
               objectChattingRoomInfo.chattingRoomMembers.map((arrayItem, arrayIndex)=> {
 
-                console.log("arrayItem", arrayItem)
+                // console.log("arrayItem", arrayItem)
                 // {"memberImageUrl": null, "memberLastAccessDate": null, "memberName": "asd", "memberNickname": "test2", "memberType": "GENERAL", "memberUUID": "dffb3741-27"}
                 return (
 
