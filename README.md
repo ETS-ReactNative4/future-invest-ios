@@ -161,3 +161,10 @@ macAddress -> 로그인 유효성 체크 (splashView, android) -> splashViewMode
 채팅방에 들어갔을때는 socket으로
 
 ~
+
+https://stackoverflow.com/questions/69238297/how-can-i-attach-word-pdf-files-to-react-native-gifted-chat
+
+https://chatkitty.com/blog/building-a-chat-app-with-react-native-and-gifted-chat-part-2
+
+https://lifesaver.codes/answer/multiline-does-not-grow-textinput-until-several-characters-into-new-line-1727
+r

@@ -6,7 +6,7 @@ export function checkValidDevice(req){
     // @Query("memberUUID") memberUUID: String,
     // @Query("macAddress") macAddress: String,
     // @Header("Authorization") authorization: String
-	return axios({ method: 'GET', url: SERVER_URL + `member/checkValidDevice${req.query}`, data: req.data, headers: req.header })
+	return axios({ method: 'GET', url: SERVER_URL + `member/checkValidDevice${req.query}`, data: null, headers: req.header })
 }
 
     /** 인증 여부 조회 **/
@@ -57,7 +57,9 @@ export function getChattingRoomInitData(req){
 }
 
 
-/** 메세지 패이징 **/
+/** 메세지 패이징 **/ 
+// 채팅방 스크롤을 이전메시지 보려고 당겼을때, 상단에 닿아 현재 가져온 메시지들을
+// 다 가져왔을 떄
 export function getChattingMessages(req){
     
     // @Query("chattingRoomId") chattingRoomId: Long,

@@ -1,5 +1,5 @@
 import React, {useContext,  useState, useEffect, useCallback, useRef, useLayoutEffect} from 'react';
-import {View, ScrollView, Text, Button, StyleSheet, Image, Modal, TouchableOpacity, Dimensions} from 'react-native';
+import {AppState,Alert, View, ScrollView, Text, Button, StyleSheet, Image, Modal, TouchableOpacity, Dimensions} from 'react-native';
 import {Bubble, GiftedChat, Send, InputToolbar} from 'react-native-gifted-chat';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -61,56 +61,117 @@ const ChatScreen = () => {
 //   그럼 useEffect는 React life cycle 중 componentDidMount에만 해당될까요?
 // 아닙니다. 정확히는 componentDidMount와 componentDidUpdate, componentWillUnmount를 합쳐놓은 것에 해당됩니다.
 
-  useEffect(() => {
-    connect();
-    const subscription = AppState.addEventListener("change", nextAppState => {
-      if (
-        appState.current.match(/inactive|background/) &&
-        nextAppState === "active"
-      ) {
-        console.log("App has come to the foreground!");
+  // useEffect(() => {
+  //   // connect();
+  //   const subscription = AppState.addEventListener("change", nextAppState => {
+  //     if (
+  //       appState.current.match(/inactive|background/) &&
+  //       nextAppState === "active"
+  //     ) {
+  //       console.log("App has come to the foreground!");
 
-        // 안드로이드 기준 onResume
-      }
+  //       // 안드로이드 기준 onResume, 앱이 포어그라운드 상태일때의 함수처리
+  //     }
 
-      appState.current = nextAppState;
-      setAppStateVisible(appState.current);
-      console.log("AppState", appState.current);
-    });
+  //     appState.current = nextAppState;
+  //     setAppStateVisible(appState.current);
+  //     console.log("AppState", appState.current);
+  //   });
 
-    return () => {
-      subscription.remove();
-      disconnect();
-    };
+  //   return () => {
+  //     subscription.remove();
+  //     disconnect();
+  //   };
 
-  }, []);
+  // }, []);
 
-  const connect = () => {
-    client.current = new StompJs.Client({
-      // brokerURL: "ws://localhost:8080/ws-stomp/websocket", // 웹소켓 서버로 직접 접속
-      webSocketFactory: () => new SockJS(WS_SERVER_URL), // proxy를 통한 접속
-      connectHeaders: {
-        "Authorization": `Bearer ${user.memberTokenInfo.accessToken}`,
-      },
-      debug: function (str) {
-        console.log(str);
-      },
-      reconnectDelay: 5000,
-      heartbeatIncoming: 4000,
-      heartbeatOutgoing: 4000,
-      onConnect: () => {
-        subscribe();
-      },
-      onStompError: (frame) => {
-        console.error(frame);
-      },
-    });
-    client.current.activate();
-  };
+  // const connect = () => {
+  //   console.log(`[Stomp]connect - 0 -  ${user.memberTokenInfo.accessToken}`)
+  //   client.current = new StompJs.Client({
+  //     brokerURL: WS_SERVER_URL, // 웹소켓 서버로 직접 접속
+  //     // webSocketFactory: () => new SockJS(WS_SERVER_URL), // proxy를 통한 접속
+  //     connectHeaders: {
+  //       "Authorization": `Bearer ${user.memberTokenInfo.accessToken}`,
+  //     },
+  //     debug: function (str) {
+  //       console.log(str);
+  //       console.log(`str ${user.memberTokenInfo.accessToken}`)
+  //     },
+  //     reconnectDelay: 5000,
+  //     heartbeatIncoming: 4000,
+  //     heartbeatOutgoing: 4000,
+  //     onConnect: () => {
+  //       console.log("[Stomp]onConnect 연결됨.");
+  //       Alert.alert("[Stomp]onConnect 연결됨.")
+  //       subscribe();
+  //     },
+  //     onStompError: (frame) => {
+  //       console.log("[Stomp]onStompError.")
+  //       Alert.alert("[Stomp]onStompError.")
+  //       console.error(frame);
+  //     },
+  //   });
+  //   client.current.activate();
+  // };
 
-  const disconnect = () => {
-    client.current.deactivate();
-  };
+  // const disconnect = () => {
+  //   client.current.deactivate();
+  // };
+
+
+  // const subscribe = () => {
+  //   client.current.subscribe(`/topic/chatting/pub/newMessage/private/${objectChatRoom1}`, ({ body }) => {
+
+  //     console.log("/topic/chatting/pub/newMessage/private/ - body", body)
+  //     setChatMessages((_chatMessages) => [..._chatMessages, JSON.parse(body)]);
+  //   });
+  //   client.current.subscribe(`/topic/chatting/pub/newMessage/public/${objectChatRoom1}`, ({ body }) => {
+
+  //     console.log("/topic/chatting/pub/newMessage/public/ - body", body)
+  //     setChatMessages((_chatMessages) => [..._chatMessages, JSON.parse(body)]);
+  //   });
+  //   client.current.subscribe(`/topic/chatting/pub/disconnect/${objectChatRoom1}`, ({ body }) => {
+
+  //     console.log("/topic/chatting/pub/disconnect/ - body", body)
+  //     setChatMessages((_chatMessages) => [..._chatMessages, JSON.parse(body)]);
+  //   });
+  //   client.current.subscribe(`/topic/chatting/sub/member/newMessage/${objectChatRoom1}`, ({ body }) => {
+  //     console.log("/topic/chatting/sub/member/newMessage/ - body", body)
+  //     setChatMessages((_chatMessages) => [..._chatMessages, JSON.parse(body)]);
+  //   });
+  //   client.current.subscribe(`/topic/chatting/sub/member/newMessage/${objectChatRoom1}/${user.uuid}`, ({ body }) => {
+  //     console.log("/topic/chatting/sub/member/newMessage/ - body", body)
+  //     setChatMessages((_chatMessages) => [..._chatMessages, JSON.parse(body)]);
+  //   });
+  //   client.current.subscribe(`/topic/chatting/sub/removeMessage/${objectChatRoom1}`, ({ body }) => {
+  //     console.log("/topic/chatting/sub/removeMessage/ - body", body)
+  //     setChatMessages((_chatMessages) => [..._chatMessages, JSON.parse(body)]);
+  //   });
+  //   client.current.subscribe(`/topic/chatting/sub/admin/newMembers/${objectChatRoom1}`, ({ body }) => {
+  //     console.log("/topic/chatting/sub/admin/newMembers/ - body", body)
+  //     setChatMessages((_chatMessages) => [..._chatMessages, JSON.parse(body)]);
+  //   });
+  //   client.current.subscribe(`/topic/chatting/sub/newInform/${objectChatRoom1}`, ({ body }) => {
+  //     console.log("/topic/chatting/sub/newInform/ - body", body)
+  //     setChatMessages((_chatMessages) => [..._chatMessages, JSON.parse(body)]);
+  //   });
+  // };
+
+  // const publish = (message) => {
+  //   if (!client.current.connected) {
+  //     return;
+  //   }
+
+  //   client.current.publish({
+  //     destination: "/pub/chat",
+  //     body: JSON.stringify({ roomSeq: objectChatRoom1, message }),
+  //   });
+
+  //   setMessage("");
+  // };
+
+
+
 
   useLayoutEffect(() => {
     return () => {
@@ -118,57 +179,6 @@ const ChatScreen = () => {
     }
 }, [])
 
-
-  const subscribe = () => {
-    client.current.subscribe(`/topic/chatting/pub/newMessage/private/${objectChatRoom1}`, ({ body }) => {
-
-      console.log("/topic/chatting/pub/newMessage/private/ - body", body)
-      setChatMessages((_chatMessages) => [..._chatMessages, JSON.parse(body)]);
-    });
-    client.current.subscribe(`/topic/chatting/pub/newMessage/public/${objectChatRoom1}`, ({ body }) => {
-
-      console.log("/topic/chatting/pub/newMessage/public/ - body", body)
-      setChatMessages((_chatMessages) => [..._chatMessages, JSON.parse(body)]);
-    });
-    client.current.subscribe(`/topic/chatting/pub/disconnect/${objectChatRoom1}`, ({ body }) => {
-
-      console.log("/topic/chatting/pub/disconnect/ - body", body)
-      setChatMessages((_chatMessages) => [..._chatMessages, JSON.parse(body)]);
-    });
-    client.current.subscribe(`/topic/chatting/sub/member/newMessage/${objectChatRoom1}`, ({ body }) => {
-      console.log("/topic/chatting/sub/member/newMessage/ - body", body)
-      setChatMessages((_chatMessages) => [..._chatMessages, JSON.parse(body)]);
-    });
-    client.current.subscribe(`/topic/chatting/sub/member/newMessage/${objectChatRoom1}/${user.uuid}`, ({ body }) => {
-      console.log("/topic/chatting/sub/member/newMessage/ - body", body)
-      setChatMessages((_chatMessages) => [..._chatMessages, JSON.parse(body)]);
-    });
-    client.current.subscribe(`/topic/chatting/sub/removeMessage/${objectChatRoom1}`, ({ body }) => {
-      console.log("/topic/chatting/sub/removeMessage/ - body", body)
-      setChatMessages((_chatMessages) => [..._chatMessages, JSON.parse(body)]);
-    });
-    client.current.subscribe(`/topic/chatting/sub/admin/newMembers/${objectChatRoom1}`, ({ body }) => {
-      console.log("/topic/chatting/sub/admin/newMembers/ - body", body)
-      setChatMessages((_chatMessages) => [..._chatMessages, JSON.parse(body)]);
-    });
-    client.current.subscribe(`/topic/chatting/sub/newInform/${objectChatRoom1}`, ({ body }) => {
-      console.log("/topic/chatting/sub/newInform/ - body", body)
-      setChatMessages((_chatMessages) => [..._chatMessages, JSON.parse(body)]);
-    });
-  };
-
-  const publish = (message) => {
-    if (!client.current.connected) {
-      return;
-    }
-
-    client.current.publish({
-      destination: "/pub/chat",
-      body: JSON.stringify({ roomSeq: objectChatRoom1, message }),
-    });
-
-    setMessage("");
-  };
 
   useEffect(()=> {
     setActionName("");
@@ -224,21 +234,6 @@ const ChatScreen = () => {
         setObjectChattingRoomInfo(res.data);
         // setMessages(res.data.chattingRoomMessages)
 
-        // {"chattingRoomInform": null, 
-        // "chattingRoomMembers": [
-      //       {"memberImageUrl": null, 
-      //       "memberLastAccessDate": null, 
-      //       "memberName": "asd", 
-      //       "memberNickname": "test2", 
-      //       "memberType": "GENERAL", 
-      //       "memberUUID": "dffb3741-27"
-      //     }, 
-      //   ], 
-      //   "chattingRoomMessages": [], 
-      //   "chattingRoomTitle": "ios_test_공개방", 
-      //   "chattingRoomType": "PUBLIC", 
-      //   "isNotificationReceive": true
-      // }
       }
     })
     .catch(e=>{
@@ -390,7 +385,6 @@ function __apiPutUpdateChattingRoomNotification(param1) {
 
   
 
-
   useEffect(() => {
     setMessages([
       // {
@@ -456,6 +450,8 @@ function __apiPutUpdateChattingRoomNotification(param1) {
   const renderAvatar = (props) => {
     return (<></>)
   }
+
+// https://stackoverflow.com/questions/67821703/how-to-display-chat-messages-on-left-and-right-in-react-native-gifted-chat
   const renderBubble = (props) => {
     // "currentMessage": {"_id": 3, "createdAt": 2022-04-30T16:44:55.015Z, "text": "Hello world", "user": {"_id": 1, "avatar": "https://placeimg.com/140/140/any", "name": "React Native"}}, 
     return (
@@ -720,6 +716,40 @@ function __apiPutUpdateChattingRoomNotification(param1) {
       </>
     )
   }
+  // export interface IMessage {
+  //   _id: string | number
+  //   text: string
+  //   createdAt: Date | number
+  //   user: User
+  //   image?: string
+  //   video?: string
+  //   audio?: string
+  //   system?: boolean
+  //   sent?: boolean
+  //   received?: boolean
+  //   pending?: boolean
+  //   quickReplies?: QuickReplies
+  // }
+  // {
+  //   _id: 1,
+  //   text: 'My message',
+  //   createdAt: new Date(Date.UTC(2016, 5, 11, 17, 20, 0)),
+  //   user: {
+  //     _id: 2,
+  //     name: 'React Native',
+  //     avatar: 'https://facebook.github.io/react/img/logo_og.png',
+  //   },
+  //   image: 'https://facebook.github.io/react/img/logo_og.png',
+  //   // You can also add a video prop:
+  //   video: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+  //   // Mark the message as sent, using one tick
+  //   sent: true,
+  //   // Mark the message as received, using two tick
+  //   received: true,
+  //   // Mark the message as pending with a clock loader
+  //   pending: true,
+  //   // Any additional custom parameters are passed through
+  // }
 
   return (
     <View style={{ flex: 1, }}>
