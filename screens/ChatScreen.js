@@ -1,15 +1,12 @@
 import React, {useContext,  useState, useEffect, useCallback, useRef, useLayoutEffect} from 'react';
 import {AppState,Alert, View, ScrollView, Text, Button, StyleSheet, Image, Modal, TouchableOpacity, Dimensions} from 'react-native';
 import {Bubble, GiftedChat, Send, InputToolbar} from 'react-native-gifted-chat';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { windowWidth, windowHeight } from '../utils/Dimentions';
 import {AuthContext} from '../navigation/AuthProvider';
 import moment from 'moment';
 import { getStatusBarHeight } from "react-native-status-bar-height";
 import { getBottomSpace } from "react-native-iphone-x-helper";
-import { FlatList } from 'react-native-gesture-handler';
-
 import DeviceInfo from 'react-native-device-info'; 
 
 import {WS_SERVER_URL} from "../api/index";
@@ -17,7 +14,7 @@ import * as BaseApi from "../api/BaseApi";
 import * as FutureInvestApi from "../api/FutureInvestApi";
 import * as StompJS from "@stomp/stompjs";
 import * as SockJS from "sockjs-client";
-
+import StompWS from 'react-native-stomp-websocket';
 
 const safeAreaHeight= Dimensions.get("window").height - getStatusBarHeight() - getBottomSpace();
 
@@ -29,83 +26,72 @@ const ChatScreen = () => {
       actionName, setActionName , 
       objectChatRoom1, setObjectChatRoom1,
       objectChattingRoomInfo, setObjectChattingRoomInfo,
-
     } = useContext(AuthContext);
-
     const appState = useRef(AppState.currentState);
     const [appStateVisible, setAppStateVisible] = useState(appState.current);
-  
+    const [messages, setMessages] = useState([]);
+    const [boolOpenSidebar, setBoolOpenSidebar] = useState(false);
+    const [boolOpenToast, setBoolOpenToast] = useState(false);
+    const [boolOpenBottomInfo, setBoolOpenBottomInfo] = useState(false);
+    const [boolNotificationPossible, setBoolNotificationPossible] = useState(false);
+    const [arrayUsers, setArrayUsers] = useState([
+      // {_id: 1, avatar: "https://placeimg.com/140/140/any", name: "한국매일증권"},
+      // {_id: 2, avatar: "https://placeimg.com/140/140/any", name: "상담관리자"},
+      // {_id: 3, avatar: "https://placeimg.com/140/140/any", name: "닉네임최대아홉자요"},
+    ]);
 
-  const [messages, setMessages] = useState([]);
-  const [boolOpenSidebar, setBoolOpenSidebar] = useState(false);
-  const [boolOpenToast, setBoolOpenToast] = useState(false);
-  const [boolOpenBottomInfo, setBoolOpenBottomInfo] = useState(false);
-  const [boolNotificationPossible, setBoolNotificationPossible] = useState(false);
-  const [arrayUsers, setArrayUsers] = useState([
-    // {_id: 1, avatar: "https://placeimg.com/140/140/any", name: "한국매일증권"},
-    // {_id: 2, avatar: "https://placeimg.com/140/140/any", name: "상담관리자"},
-    // {_id: 3, avatar: "https://placeimg.com/140/140/any", name: "닉네임최대아홉자요"},
-  ]);
-
-
-  const [ms, setMs] = useState("");
-  const [content, setContent] = useState("");
-
-  useEffect(() => {
-    console.log("ChatScreen objectStore", objectStore);
-    console.log("ChatScreen objectChatRoom1", objectChatRoom1);
-    if (objectStore && objectStore.type && objectStore.type == "popup") {
-      setBoolOpenSidebar(true);
-    }
-
-  },[objectStore]);
 
 
     useEffect(() => {
-        wsSubscribe();
-    return () => wsDisconnect();
-    }, []);
+      console.log("ChatScreen objectStore", objectStore);
+      console.log("ChatScreen objectChatRoom1", objectChatRoom1);
+      if (objectStore && objectStore.type && objectStore.type == "popup") {
+      setBoolOpenSidebar(true);
+      }
 
-    const client = new StompJS.Client({
-        brokerURL: "ws://3.38.20.168:8080/websocket/invest",
-        connectHeaders: {
-
-          // "Authorization": `Bearer ${user.memberTokenInfo.access Token}`,
-        },
-        debug: function (str) {
-            console.log(str);
-        },
-    });
-
-    client.activate();
-
-    const onClick = (message) => {
-        console.log(client.connected);
-        if (!client.connected)
-            return;
-
-        client.publish({
-            destination: '/app/hello',
-            body: JSON.stringify({
-                'message': message
-            }),
-        })
-    }
+    },[objectStore]);
 
 
-    const wsSubscribe = () => {
-        client.onConnect = () => {
-          console.log("wsSubscribe....")
-            client.subscribe('/topic/message', (msg) => {
-                const newMessage = JSON.parse(msg.body).message;
-                setContent(newMessage);
-            }, {id: "user"})
-        }
-    }
 
-    const wsDisconnect = () => {
-        client.deactivate();
-    }
+
+
+
+    // const wsSubscribe = () => {
+    //     client.onConnect = () => {
+    //       console.log("wsSubscribe....")
+    //       console.log("ChatScreen objectStore", objectStore);
+    //       console.log("ChatScreen objectChatRoom1", objectChatRoom1);
+
+    //     var chattingRoomId = objectChatRoom1;
+    //     var memberUUID = user.uuid;
+    //     var PUB_NEW_PRIVATE_MESSAGE = `/topic/chatting/pub/newMessage/private/${chattingRoomId}`;
+    //     var PUB_NEW_PUBLIC_MESSAGE = `/topic/chatting/pub/newMessage/public/${chattingRoomId}`;
+    //     var PUB_DISCONNECT_CHATTING_ROOM = `/topic/chatting/pub/disconnect/${chattingRoomId}`;
+
+    //     var SUB_NEW_MESSAGE = `/topic/chatting/sub/member/newMessage/`;
+    //     var SUB_NEW_MESSAGE_TO_ME = `/topic/chatting/sub/member/newMessage/${chattingRoomId}/${memberUUID}`;
+
+    //     var SUB_REMOVE_MESSAGE = `/topic/chatting/sub/removeMessage/${chattingRoomId}`;
+    //     var SUB_NEW_MEMBERS = `/topic/chatting/sub/admin/newMembers/${chattingRoomId}`;
+    //     var SUB_NEW_INFORM = `/topic/chatting/sub/newInform/${chattingRoomId}`;
+
+    //         client.subscribe(PUB_NEW_PRIVATE_MESSAGE, (msg) => {
+    //           // const newMessage = JSON.parse(msg.body).message;
+    //           // setContent(newMessage);
+    //           console.log("PUB_NEW_PRIVATE_MESSAGE", msg)
+    //       }, {id: "user"})
+    //       client.subscribe(PUB_NEW_PUBLIC_MESSAGE, (msg) => {
+    //           // const newMessage = JSON.parse(msg.body).message;
+    //           // setContent(newMessage);
+    //           console.log("PUB_NEW_PUBLIC_MESSAGE", msg)
+    //       }, {id: "user"})
+    //       client.subscribe(PUB_DISCONNECT_CHATTING_ROOM, (msg) => {
+    //           // const newMessage = JSON.parse(msg.body).message;
+    //           // setContent(newMessage);
+    //           console.log("PUB_DISCONNECT_CHATTING_ROOM", msg)
+    //       }, {id: "user"})
+    //     }
+    // }
 
 
 
@@ -119,8 +105,26 @@ const ChatScreen = () => {
   useEffect(()=> {
     setActionName("");
 
-    console.log("objectChatRoom1.chattingRoomId", objectChatRoom1.chattingRoomId)
-    __apiGetChattingRoomInitData(objectChatRoom1);
+
+    // TEST
+    console.log("ChatScreen objectStore", objectStore);
+    console.log("ChatScreen objectChatRoom1", objectChatRoom1);
+
+    const client = StompWS.client('[STOMP URL]');
+    client.debug = (text) => console.log(text);
+    client.connect(() => {
+      alert('success');
+    }, function (e) {
+      alert('errr');
+      console.log(e);
+    })
+
+    // PROD
+    // wsSubscribe();
+    // return () => wsDisconnect();
+    // console.log("objectChatRoom1.chattingRoomId", objectChatRoom1.chattingRoomId)
+    
+    // __apiGetChattingRoomInitData(objectChatRoom1);
     // __apiGetChattingMessages(objectChatRoom1);
   }, [])
 
@@ -319,7 +323,6 @@ function __apiPutUpdateChattingRoomNotification(param1) {
     })
   }
 
-  
 
   useEffect(() => {
     setMessages([
