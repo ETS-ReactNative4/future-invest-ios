@@ -39,9 +39,13 @@ const ChatScreen = () => {
       // {_id: 2, avatar: "https://placeimg.com/140/140/any", name: "상담관리자"},
       // {_id: 3, avatar: "https://placeimg.com/140/140/any", name: "닉네임최대아홉자요"},
     ]);
+    const ws = useRef(null);
 
-
-
+    const [senderId, setSenderId] = useState("");
+    const [receiverId, setReceiverId] = useState("")
+    const [name, setName] = useState("")
+    const [image_path, setImage_path] = useState("")
+    
     useEffect(() => {
       console.log("ChatScreen objectStore", objectStore);
       console.log("ChatScreen objectChatRoom1", objectChatRoom1);
@@ -52,73 +56,126 @@ const ChatScreen = () => {
     },[objectStore]);
 
 
+    useEffect(() => {
+      console.log("[test ::: ] initiateSocketConnection")
+      console.log("[test ::: ] ChatScreen objectStore", objectStore);
+      console.log("[test ::: ] ChatScreen objectChatRoom1", objectChatRoom1);
+      var chattingRoomId = objectChatRoom1 ? objectChatRoom1 : '';
+      console.log("[test ::: ] ChatScreen chattingRoomId", chattingRoomId);
+
+      var memberUUID = user && user.uuid ? user.uuid : '';
+      var  PUB_NEW_PRIVATE_MESSAGE = `/topic/chatting/pub/newMessage/private/${chattingRoomId}`
+      var  PUB_NEW_PUBLIC_MESSAGE =  `/topic/chatting/pub/newMessage/public/${chattingRoomId}`
+      var  PUB_DISCONNECT_CHATTING_ROOM = `/topic/chatting/pub/disconnect/${chattingRoomId}`
+      var  SUB_NEW_MESSAGE = `/topic/chatting/sub/member/newMessage/${chattingRoomId}`
+      var  SUB_NEW_MESSAGE_TO_ME = `/topic/chatting/sub/member/newMessage/${chattingRoomId}/${memberUUID}`
+      var  SUB_REMOVE_MESSAGE = `/topic/chatting/sub/removeMessage/${chattingRoomId}`
+      var  SUB_NEW_MEMBERS = `/topic/chatting/sub/admin/newMembers/${chattingRoomId}`
+      var  SUB_NEW_INFORM =  `/topic/chatting/sub/newInform/${chattingRoomId}`
+      
+      // https://developer.mozilla.org/ko/docs/Web/API/WebSockets_API/Writing_WebSocket_client_applications
+      ws.current = new WebSocket("ws://3.38.20.168:8080/websocket/invest")
+      // enter your websocket url
+      ws.current.onopen = () => {
+        console.log("[test ::: ] connection establish open")
+        ws.current.send(JSON.stringify({ topic: "subscribe", to: `${PUB_NEW_PRIVATE_MESSAGE}`}))
+        ws.current.send(JSON.stringify({ topic: "subscribe", to: `${PUB_NEW_PUBLIC_MESSAGE}`}))
+        ws.current.send(JSON.stringify({ topic: "subscribe", to: `${PUB_DISCONNECT_CHATTING_ROOM}`}))
+        ws.current.send(JSON.stringify({ topic: "subscribe", to: `${SUB_NEW_MESSAGE}`}))
+        ws.current.send(JSON.stringify({ topic: "subscribe", to: `${SUB_NEW_MESSAGE_TO_ME}`}))
+        ws.current.send(JSON.stringify({ topic: "subscribe", to: `${SUB_REMOVE_MESSAGE}`}))
+        ws.current.send(JSON.stringify({ topic: "subscribe", to: `${SUB_NEW_MEMBERS}`}))
+        ws.current.send(JSON.stringify({ topic: "subscribe", to: `${SUB_NEW_INFORM}`}))
+
+      };
+      ws.current.onclose = () => {
+        console.log("connection establish closed");
+      }
+      return () => {
+        ws.current.close();
+      };
+    }, [])
+  
+    useEffect(() => {
+      const receiverId = user && user.uuid ? user.uuid : ''
+      const senderId = user && user.uuid ? user.uuid : ''
+      const name = user && user.name ? user.name : '';
+      setMessages([
+        {
+          _id: receiverId,// receiver id
+          text: 'Hello developer',
+          createdAt: new Date(),
+          user: {
+            _id: senderId,  // sender id
+            name: name,
+            avatar: image_path,
+          },
+        },
+      ])
+    }, [])
+  
+    useEffect(() => {
+      ws.current.onmessage = e => {
+        const response = JSON.parse(e.data);
+        console.log("onmessage=>", JSON.stringify(response));
+        Alert.alert(JSON.stringify(response))
+        // parse data
+        // const json = JSON.parse(event.data);
+        // try {
+        //   if ((json.event = "data")) {
+        //     setBids(json.data.bids.slice(0, 5));
+        //   }
+        // } catch (err) {
+        //   console.log(err);
+        // }
+        
+        var sentMessages = {
+          _id: response.receiverId,
+          text: response.message,
+          createdAt: new Date(response.createdAt * 1000),
+          user: {
+            _id: response.senderId,
+            name: name,
+            avatar: image_path,
+          },
+        }
+        setMessages(previousMessages => GiftedChat.append(previousMessages, sentMessages))
+      };
+    }, []);
+  
+    const onSend = useCallback((messages = []) => {
+
+      var chattingRoomId = objectChatRoom1 ? objectChatRoom1 : '';
+      console.log("[test ::: ] ChatScreen chattingRoomId", chattingRoomId);
+
+      var memberUUID = user && user.uuid ? user.uuid : '';
+      var  PUB_NEW_PRIVATE_MESSAGE = `/topic/chatting/pub/newMessage/private/${chattingRoomId}`
+      var  PUB_NEW_PUBLIC_MESSAGE =  `/topic/chatting/pub/newMessage/public/${chattingRoomId}`
+      var  PUB_DISCONNECT_CHATTING_ROOM = `/topic/chatting/pub/disconnect/${chattingRoomId}`
+      var  SUB_NEW_MESSAGE = `/topic/chatting/sub/member/newMessage/${chattingRoomId}`
+      var  SUB_NEW_MESSAGE_TO_ME = `/topic/chatting/sub/member/newMessage/${chattingRoomId}/${memberUUID}`
+      var  SUB_REMOVE_MESSAGE = `/topic/chatting/sub/removeMessage/${chattingRoomId}`
+      var  SUB_NEW_MEMBERS = `/topic/chatting/sub/admin/newMembers/${chattingRoomId}`
+      var  SUB_NEW_INFORM =  `/topic/chatting/sub/newInform/${chattingRoomId}`
+
+      let obj = {
+        "senderId": senderId,
+        "receiverId": receiverId,
+        "message": messages[0].text,
+        "action": SUB_NEW_MESSAGE,
+      }
+      ws.current.send(JSON.stringify(obj))
+      setMessages(previousMessages => GiftedChat.append(previousMessages, messages))
+    }, [])
 
 
-
-
-    // const wsSubscribe = () => {
-    //     client.onConnect = () => {
-    //       console.log("wsSubscribe....")
-    //       console.log("ChatScreen objectStore", objectStore);
-    //       console.log("ChatScreen objectChatRoom1", objectChatRoom1);
-
-    //     var chattingRoomId = objectChatRoom1;
-    //     var memberUUID = user.uuid;
-    //     var PUB_NEW_PRIVATE_MESSAGE = `/topic/chatting/pub/newMessage/private/${chattingRoomId}`;
-    //     var PUB_NEW_PUBLIC_MESSAGE = `/topic/chatting/pub/newMessage/public/${chattingRoomId}`;
-    //     var PUB_DISCONNECT_CHATTING_ROOM = `/topic/chatting/pub/disconnect/${chattingRoomId}`;
-
-    //     var SUB_NEW_MESSAGE = `/topic/chatting/sub/member/newMessage/`;
-    //     var SUB_NEW_MESSAGE_TO_ME = `/topic/chatting/sub/member/newMessage/${chattingRoomId}/${memberUUID}`;
-
-    //     var SUB_REMOVE_MESSAGE = `/topic/chatting/sub/removeMessage/${chattingRoomId}`;
-    //     var SUB_NEW_MEMBERS = `/topic/chatting/sub/admin/newMembers/${chattingRoomId}`;
-    //     var SUB_NEW_INFORM = `/topic/chatting/sub/newInform/${chattingRoomId}`;
-
-    //         client.subscribe(PUB_NEW_PRIVATE_MESSAGE, (msg) => {
-    //           // const newMessage = JSON.parse(msg.body).message;
-    //           // setContent(newMessage);
-    //           console.log("PUB_NEW_PRIVATE_MESSAGE", msg)
-    //       }, {id: "user"})
-    //       client.subscribe(PUB_NEW_PUBLIC_MESSAGE, (msg) => {
-    //           // const newMessage = JSON.parse(msg.body).message;
-    //           // setContent(newMessage);
-    //           console.log("PUB_NEW_PUBLIC_MESSAGE", msg)
-    //       }, {id: "user"})
-    //       client.subscribe(PUB_DISCONNECT_CHATTING_ROOM, (msg) => {
-    //           // const newMessage = JSON.parse(msg.body).message;
-    //           // setContent(newMessage);
-    //           console.log("PUB_DISCONNECT_CHATTING_ROOM", msg)
-    //       }, {id: "user"})
-    //     }
-    // }
-
-
-
-  useLayoutEffect(() => {
-    return () => {
-        // Your code here. - ComponentWillUnmount
-    }
-}, [])
-
-
-  useEffect(()=> {
+    useEffect(()=> {
     setActionName("");
 
 
     // TEST
     console.log("ChatScreen objectStore", objectStore);
     console.log("ChatScreen objectChatRoom1", objectChatRoom1);
-
-    const client = StompWS.client('[STOMP URL]');
-    client.debug = (text) => console.log(text);
-    client.connect(() => {
-      alert('success');
-    }, function (e) {
-      alert('errr');
-      console.log(e);
-    })
-
     // PROD
     // wsSubscribe();
     // return () => wsDisconnect();
@@ -361,17 +418,52 @@ function __apiPutUpdateChattingRoomNotification(param1) {
     ]);
   }, []);
 
-  const onSend = useCallback((messages = []) => {
-    setMessages((previousMessages) =>
-      GiftedChat.append(previousMessages, messages),
-      
-    );
-  }, []);
 
   const renderSend = (props) => {
     return (
       <Send {...props}
       containerStyle={{ width: 44, height: 29, border : 'none', backgroundColor: "#3c1e1e",  display: 'flex',alignItems: 'center', justifyContent: 'center', marginBottom: 6, marginRight: 10, borderRadius: 15}}
+      onSend={()=> {
+        console.log("props", props.text)
+        // SendMessageDTO
+    // val sendMessageId: String?,
+    // val sendMemberUUID: String,
+    // val sendMemberType: MemberType?,
+    // val content: String?,
+    // val messageType: MessageType,
+    // val replyMessageId: String?,
+    // val replyMessageContent: String?,
+    // var targetMemberUUID: String?,
+    // val fileMetaData: MessageFileMetaDataDTO? = null
+
+
+    // null,
+    // vm.myInfo?.uuid!!,
+    // MemberType.GENERAL,
+    // content,
+    // messageType = if (vm.replyMessageId.value == null) GENERAL else REPLY,
+    // vm.replyMessageId.value,
+    // vm.replyMessageContent.value,
+    // vm.replyMessageCreatedMemberUUID.value
+
+
+        var chattingRoomId = objectChatRoom1 ? objectChatRoom1 : '';
+        console.log("[test ::: ] ChatScreen chattingRoomId", chattingRoomId);
+
+        var memberUUID = user && user.uuid ? user.uuid : '';
+        var  PUB_NEW_PRIVATE_MESSAGE = `/topic/chatting/pub/newMessage/private/${chattingRoomId}`
+        var  PUB_NEW_PUBLIC_MESSAGE =  `/topic/chatting/pub/newMessage/public/${chattingRoomId}`
+        var  PUB_DISCONNECT_CHATTING_ROOM = `/topic/chatting/pub/disconnect/${chattingRoomId}`
+        var  SUB_NEW_MESSAGE = `/topic/chatting/sub/member/newMessage/${chattingRoomId}`
+        var  SUB_NEW_MESSAGE_TO_ME = `/topic/chatting/sub/member/newMessage/${chattingRoomId}/${memberUUID}`
+        var  SUB_REMOVE_MESSAGE = `/topic/chatting/sub/removeMessage/${chattingRoomId}`
+        var  SUB_NEW_MEMBERS = `/topic/chatting/sub/admin/newMembers/${chattingRoomId}`
+        var  SUB_NEW_INFORM =  `/topic/chatting/sub/newInform/${chattingRoomId}`
+        
+        const data = JSON.stringify({sendMessageId : '', sendMemberUUID : user.uuid, sendMemberType :'GENERAL', content : props.text , messageType : 'GENERAL', replyMessageId : '', replyMessageContent : '',  targetMemberUUID : '' });
+        ws.current.send(JSON.stringify({topic : PUB_NEW_PUBLIC_MESSAGE, data : data}))
+        // ws.current.send(JSON.stringify({topic : PUB_NEW_PRIVATE_MESSAGE, data : data}))
+      }}
       >
         <View style={{ border : 'none', display: 'flex',alignItems: 'center', justifyContent: 'center'}}>
           <View style={{ border : 'none', display: 'flex',alignItems: 'center', justifyContent: 'center'}}>
