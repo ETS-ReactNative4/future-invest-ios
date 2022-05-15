@@ -168,3 +168,15 @@ https://chatkitty.com/blog/building-a-chat-app-with-react-native-and-gifted-chat
 
 https://lifesaver.codes/answer/multiline-does-not-grow-textinput-until-several-characters-into-new-line-1727
 r
+
+
+
+# STOMP ERROR
+
+https://stomp-js.github.io/guide/stompjs/rx-stomp/ng2-stompjs/pollyfils-for-stompjs-v5.html#in-react-native
+
+ npm install text-encoding
+ import * as encoding from 'text-encoding';
+
+
+ 

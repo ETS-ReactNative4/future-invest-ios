@@ -15,7 +15,7 @@ import DeviceInfo from 'react-native-device-info';
 import {WS_SERVER_URL} from "../api/index";
 import * as BaseApi from "../api/BaseApi";
 import * as FutureInvestApi from "../api/FutureInvestApi";
-import * as StompJs from "@stomp/stompjs";
+import * as StompJS from "@stomp/stompjs";
 import * as SockJS from "sockjs-client";
 
 
@@ -35,7 +35,6 @@ const ChatScreen = () => {
     const appState = useRef(AppState.currentState);
     const [appStateVisible, setAppStateVisible] = useState(appState.current);
   
-    const client = useRef({});
 
   const [messages, setMessages] = useState([]);
   const [boolOpenSidebar, setBoolOpenSidebar] = useState(false);
@@ -49,6 +48,9 @@ const ChatScreen = () => {
   ]);
 
 
+  const [ms, setMs] = useState("");
+  const [content, setContent] = useState("");
+
   useEffect(() => {
     console.log("ChatScreen objectStore", objectStore);
     console.log("ChatScreen objectChatRoom1", objectChatRoom1);
@@ -57,119 +59,53 @@ const ChatScreen = () => {
     }
 
   },[objectStore]);
-  
-//   그럼 useEffect는 React life cycle 중 componentDidMount에만 해당될까요?
-// 아닙니다. 정확히는 componentDidMount와 componentDidUpdate, componentWillUnmount를 합쳐놓은 것에 해당됩니다.
-
-  // useEffect(() => {
-  //   // connect();
-  //   const subscription = AppState.addEventListener("change", nextAppState => {
-  //     if (
-  //       appState.current.match(/inactive|background/) &&
-  //       nextAppState === "active"
-  //     ) {
-  //       console.log("App has come to the foreground!");
-
-  //       // 안드로이드 기준 onResume, 앱이 포어그라운드 상태일때의 함수처리
-  //     }
-
-  //     appState.current = nextAppState;
-  //     setAppStateVisible(appState.current);
-  //     console.log("AppState", appState.current);
-  //   });
-
-  //   return () => {
-  //     subscription.remove();
-  //     disconnect();
-  //   };
-
-  // }, []);
-
-  // const connect = () => {
-  //   console.log(`[Stomp]connect - 0 -  ${user.memberTokenInfo.accessToken}`)
-  //   client.current = new StompJs.Client({
-  //     brokerURL: WS_SERVER_URL, // 웹소켓 서버로 직접 접속
-  //     // webSocketFactory: () => new SockJS(WS_SERVER_URL), // proxy를 통한 접속
-  //     connectHeaders: {
-  //       "Authorization": `Bearer ${user.memberTokenInfo.accessToken}`,
-  //     },
-  //     debug: function (str) {
-  //       console.log(str);
-  //       console.log(`str ${user.memberTokenInfo.accessToken}`)
-  //     },
-  //     reconnectDelay: 5000,
-  //     heartbeatIncoming: 4000,
-  //     heartbeatOutgoing: 4000,
-  //     onConnect: () => {
-  //       console.log("[Stomp]onConnect 연결됨.");
-  //       Alert.alert("[Stomp]onConnect 연결됨.")
-  //       subscribe();
-  //     },
-  //     onStompError: (frame) => {
-  //       console.log("[Stomp]onStompError.")
-  //       Alert.alert("[Stomp]onStompError.")
-  //       console.error(frame);
-  //     },
-  //   });
-  //   client.current.activate();
-  // };
-
-  // const disconnect = () => {
-  //   client.current.deactivate();
-  // };
 
 
-  // const subscribe = () => {
-  //   client.current.subscribe(`/topic/chatting/pub/newMessage/private/${objectChatRoom1}`, ({ body }) => {
+    useEffect(() => {
+        wsSubscribe();
+    return () => wsDisconnect();
+    }, []);
 
-  //     console.log("/topic/chatting/pub/newMessage/private/ - body", body)
-  //     setChatMessages((_chatMessages) => [..._chatMessages, JSON.parse(body)]);
-  //   });
-  //   client.current.subscribe(`/topic/chatting/pub/newMessage/public/${objectChatRoom1}`, ({ body }) => {
+    const client = new StompJS.Client({
+        brokerURL: "ws://3.38.20.168:8080/websocket/invest",
+        connectHeaders: {
 
-  //     console.log("/topic/chatting/pub/newMessage/public/ - body", body)
-  //     setChatMessages((_chatMessages) => [..._chatMessages, JSON.parse(body)]);
-  //   });
-  //   client.current.subscribe(`/topic/chatting/pub/disconnect/${objectChatRoom1}`, ({ body }) => {
+          // "Authorization": `Bearer ${user.memberTokenInfo.access Token}`,
+        },
+        debug: function (str) {
+            console.log(str);
+        },
+    });
 
-  //     console.log("/topic/chatting/pub/disconnect/ - body", body)
-  //     setChatMessages((_chatMessages) => [..._chatMessages, JSON.parse(body)]);
-  //   });
-  //   client.current.subscribe(`/topic/chatting/sub/member/newMessage/${objectChatRoom1}`, ({ body }) => {
-  //     console.log("/topic/chatting/sub/member/newMessage/ - body", body)
-  //     setChatMessages((_chatMessages) => [..._chatMessages, JSON.parse(body)]);
-  //   });
-  //   client.current.subscribe(`/topic/chatting/sub/member/newMessage/${objectChatRoom1}/${user.uuid}`, ({ body }) => {
-  //     console.log("/topic/chatting/sub/member/newMessage/ - body", body)
-  //     setChatMessages((_chatMessages) => [..._chatMessages, JSON.parse(body)]);
-  //   });
-  //   client.current.subscribe(`/topic/chatting/sub/removeMessage/${objectChatRoom1}`, ({ body }) => {
-  //     console.log("/topic/chatting/sub/removeMessage/ - body", body)
-  //     setChatMessages((_chatMessages) => [..._chatMessages, JSON.parse(body)]);
-  //   });
-  //   client.current.subscribe(`/topic/chatting/sub/admin/newMembers/${objectChatRoom1}`, ({ body }) => {
-  //     console.log("/topic/chatting/sub/admin/newMembers/ - body", body)
-  //     setChatMessages((_chatMessages) => [..._chatMessages, JSON.parse(body)]);
-  //   });
-  //   client.current.subscribe(`/topic/chatting/sub/newInform/${objectChatRoom1}`, ({ body }) => {
-  //     console.log("/topic/chatting/sub/newInform/ - body", body)
-  //     setChatMessages((_chatMessages) => [..._chatMessages, JSON.parse(body)]);
-  //   });
-  // };
+    client.activate();
 
-  // const publish = (message) => {
-  //   if (!client.current.connected) {
-  //     return;
-  //   }
+    const onClick = (message) => {
+        console.log(client.connected);
+        if (!client.connected)
+            return;
 
-  //   client.current.publish({
-  //     destination: "/pub/chat",
-  //     body: JSON.stringify({ roomSeq: objectChatRoom1, message }),
-  //   });
+        client.publish({
+            destination: '/app/hello',
+            body: JSON.stringify({
+                'message': message
+            }),
+        })
+    }
 
-  //   setMessage("");
-  // };
 
+    const wsSubscribe = () => {
+        client.onConnect = () => {
+          console.log("wsSubscribe....")
+            client.subscribe('/topic/message', (msg) => {
+                const newMessage = JSON.parse(msg.body).message;
+                setContent(newMessage);
+            }, {id: "user"})
+        }
+    }
+
+    const wsDisconnect = () => {
+        client.deactivate();
+    }
 
 
 

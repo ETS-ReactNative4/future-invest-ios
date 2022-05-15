@@ -1,6 +1,7 @@
  import React, {Component, useEffect} from 'react';
  import Providers from './navigation';
  import Icon from 'react-native-vector-icons/MaterialIcons'
+ import * as encoding from 'text-encoding';
  
  import {
    TextInput,
