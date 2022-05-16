@@ -180,3 +180,7 @@ https://stomp-js.github.io/guide/stompjs/rx-stomp/ng2-stompjs/pollyfils-for-stom
 
 
  
+https://www.pluralsight.com/guides/using-web-sockets-in-your-reactredux-app
+https://ably.com/topic/websockets-react-native
+https://velog.io/@ysung327/react-native웹소켓-적용하기
+https://stackoverflow.com/questions/60152922/proper-way-of-using-react-hooks-websockets

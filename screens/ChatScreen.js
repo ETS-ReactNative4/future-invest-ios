@@ -77,7 +77,16 @@ const ChatScreen = () => {
       ws.current = new WebSocket("ws://3.38.20.168:8080/websocket/invest")
       // enter your websocket url
       ws.current.onopen = () => {
-        console.log("[test ::: ] connection establish open")
+        console.log("[onopen ::: ] connection establish open")
+        
+        console.log("[ws:onopen]PUB_NEW_PRIVATE_MESSAGE", PUB_NEW_PRIVATE_MESSAGE)
+        console.log("[ws:onopen]PUB_NEW_PUBLIC_MESSAGE", PUB_NEW_PUBLIC_MESSAGE)
+        console.log("[ws:onopen]PUB_DISCONNECT_CHATTING_ROOM", PUB_DISCONNECT_CHATTING_ROOM)
+        console.log("[ws:onopen]SUB_NEW_MESSAGE_TO_ME", SUB_NEW_MESSAGE_TO_ME)
+        console.log("[ws:onopen]SUB_NEW_MESSAGE", SUB_NEW_MESSAGE)
+        console.log("[ws:onopen]SUB_NEW_MEMBERS", SUB_NEW_MEMBERS)
+        console.log("[ws:onopen]SUB_NEW_INFORM", SUB_NEW_INFORM)
+
         ws.current.send(JSON.stringify({ topic: "subscribe", to: `${PUB_NEW_PRIVATE_MESSAGE}`}))
         ws.current.send(JSON.stringify({ topic: "subscribe", to: `${PUB_NEW_PUBLIC_MESSAGE}`}))
         ws.current.send(JSON.stringify({ topic: "subscribe", to: `${PUB_DISCONNECT_CHATTING_ROOM}`}))
@@ -88,9 +97,20 @@ const ChatScreen = () => {
         ws.current.send(JSON.stringify({ topic: "subscribe", to: `${SUB_NEW_INFORM}`}))
 
       };
-      ws.current.onclose = () => {
-        console.log("connection establish closed");
-      }
+      ws.current.onmessage = (e) => {
+          // a message was received
+          console.log("[ws:onmessage]", e.data);
+      };
+  
+      ws.current.onerror = (e) => {
+        console.log("[ws:onerror]", e.message);
+      };
+  
+      ws.current.onclose = (e) => {
+          // connection closed
+          console.log(e.code, e.reason);
+          console.log("[ws:onclose]", "connection establish closed");
+      };
       return () => {
         ws.current.close();
       };
