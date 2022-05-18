@@ -184,3 +184,20 @@ https://www.pluralsight.com/guides/using-web-sockets-in-your-reactredux-app
 https://ably.com/topic/websockets-react-native
 https://velog.io/@ysung327/react-native웹소켓-적용하기
 https://stackoverflow.com/questions/60152922/proper-way-of-using-react-hooks-websockets
+
+
+It is known bug in react-native to support ios14 https://github.com/facebook/react-native/issues/29279
+
+and fixed in react-native v0.63.2 https://github.com/facebook/react-native/issues/29237#issuecomment-666940070
+
+Solution
+
+Update react native using https://reactnative.dev/docs/upgrading.html
+or
+
+Use https://github.com/DylanVann/react-native-fast-image
+
+
+https://developer.apple.com/forums/thread/92638
+
+https://github.com/oblador/react-native-vector-icons/issues/1074

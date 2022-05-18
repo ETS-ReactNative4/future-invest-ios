@@ -18,6 +18,7 @@
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		8EF4050466B749F9A01BCDF5 /* Lato-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 553529B3C40D4B7995D3E81C /* Lato-Bold.ttf */; };
 		DB831FC2D81A485D8C9E8366 /* Lato-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D16E40F4D4424CEA92ADD50E /* Lato-BoldItalic.ttf */; };
+		EF2CC78628331B590006D916 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		EF47AA29280877FF0012CEEF /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = EF47AA28280877FF0012CEEF /* GoogleService-Info.plist */; };
 		EF47AA2D28087D2E0012CEEF /* NotoSansKR-Black.otf in Resources */ = {isa = PBXBuildFile; fileRef = EF47AA2C28087D2E0012CEEF /* NotoSansKR-Black.otf */; };
 		EF47AA2F28087D380012CEEF /* NotoSansKR-Light.otf in Resources */ = {isa = PBXBuildFile; fileRef = EF47AA2E28087D380012CEEF /* NotoSansKR-Light.otf */; };
@@ -322,6 +323,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EF2CC78628331B590006D916 /* Images.xcassets in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				EF47AA29280877FF0012CEEF /* GoogleService-Info.plist in Resources */,
 				1F58E997427D476985F300E2 /* Kufam-SemiBoldItalic.ttf in Resources */,
@@ -582,11 +584,11 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3B4392A12AC88292D35C810B /* Pods-stockleading_reactnative1.debug.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-1";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = stockleading_reactnative1/stockleading_reactnative1.entitlements;
-				CURRENT_PROJECT_VERSION = 12;
+				CURRENT_PROJECT_VERSION = 13;
 				DEVELOPMENT_TEAM = AL24662ZQD;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = stockleading_reactnative1/Info.plist;
@@ -614,11 +616,11 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5709B34CF0A7D63546082F79 /* Pods-stockleading_reactnative1.release.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-1";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = stockleading_reactnative1/stockleading_reactnative1.entitlements;
-				CURRENT_PROJECT_VERSION = 12;
+				CURRENT_PROJECT_VERSION = 13;
 				DEVELOPMENT_TEAM = AL24662ZQD;
 				INFOPLIST_FILE = stockleading_reactnative1/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
