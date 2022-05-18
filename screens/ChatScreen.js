@@ -1,88 +1,103 @@
-import React, { Component } from 'react';
+import React, {useEffect, useState, useCallback, useRef} from 'react';
 
 import {
-  AppRegistry,
-  StyleSheet,
-  Text,
   View,
-  Button
+  Text,
+  Platform,
+  StyleSheet,
+  Alert,
+  ActivityIndicator,
+  TouchableOpacity
 } from 'react-native';
-import { WS_SERVER_URL } from '../api/index';
+import SockJS from 'sockjs-client';
+import * as StompJS from '@stomp/stompjs';
 
-export default class socketTest extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { open: false };
-    this.socket = new WebSocket(WS_SERVER_URL);
-    this.emit = this.emit.bind(this);
-  }
+const TestContainer = () => {
+    const [ms, setMs] = useState("");
+    const [content, setContent] = useState("");
 
-  emit() {
-    this.setState(prevState => ({ open: !prevState.open }))
-    this.socket.send("It worked!")
-  }
+    useEffect(() => {
+        wsSubscribe();
+      return () => wsDisconnect();
+    }, []);
 
-  render() {
+    const client = new StompJS.Client({
+        brokerURL:  "ws://3.38.20.168:8080/websocket/invest", // 왜 websocket을 붙여줘야하는거지..?
+        // connectHeaders: {
+        //     login: 'user',
+        //     password: 'password'
+        // },
+        debug: function (str) {
+            console.log(str);
+        },
+    });
 
-    const LED = {
-      backgroundColor: this.state.open ? 'lightgreen' : 'red',
-      height: 30,
-      position: 'absolute',
-      flexDirection: 'row',
-      bottom: 0,
-      width: 100,
-      height: 100,
-      top: 120,
-      borderRadius: 40,
-      justifyContent: 'space-between'
+    client.activate();
 
+    const onClick = (message ) => {
+        console.log(client.connected);
+        if (!client.connected)
+            return;
+
+        client.publish({
+            destination: '/app/hello',
+            body: JSON.stringify({
+                'message': message
+            }),
+        })
+    }
+
+
+    const wsSubscribe = () => {
+        client.onConnect = () => {
+          
+            client.subscribe('/topic/message', (msg) => {
+                const newMessage = JSON.parse(msg.body).message;
+                setContent(newMessage);
+            }, {id: "user"})
+        }
+    }
+
+    const wsDisconnect = () => {
+        client.deactivate();
     }
 
     return (
-      <View style={styles.container}>
-        <Button
-          onPress={this.emit}
-          title={this.state.open ? "Turn off" : "Turn on"}
-          color="#21ba45"
-          accessibilityLabel="Learn more about this purple button"
-        />
-        <View style={LED}></View>
-      </View>
-    );
-  }
-
-  componentDidMount() {
-    this.socket.onopen = () => { 
-      console.log('onopen.')
-    }
-    this.socket.onclose = () => { 
-      console.log('onclose.')
-    }
-    this.socket.onclose = () => { 
-      console.log('onclose.')
-    }
-    this.socket.onmessage = ({ data }) => console.log(JSON.parse(data).payload)
-  }
-
+        <>
+            
+        </>
+    )
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-  },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
-});
+export default TestContainer;
 
-// AppRegistry.registerComponent('socketTest', () => socketTest);
+const Container = (props ) => {
+    const [ms, setMs] = useState("");
+    const {sendMessage} = props;
+
+    const _onChange = useCallback(
+        (e) => {
+            setMs(e.target.value);
+        },
+        []
+    );
+
+    return (
+        <>
+            {/* <input
+                value={ms}
+                onChange={_onChange}
+                name={"ms"}
+            /> */}
+            <TouchableOpacity
+                type={"button"}
+                onClick={() => {
+                    sendMessage(ms);
+                    setMs("");
+                }}
+            >
+                <Text>전송</Text>
+            </TouchableOpacity>
+        </>
+    );
+}
