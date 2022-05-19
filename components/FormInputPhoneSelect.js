@@ -36,6 +36,7 @@ const FormInput = ({labelText, labelValue1, labelValue2, placeholderText, iconTy
             placeholderTextColor="#cccccc"
             onChangeText={onChangeText2}
             {...rest}
+            keyboardType={`number-pad`}
         />
         </View>
         <TouchableOpacity style={styles.checkButton}

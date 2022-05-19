@@ -31,26 +31,55 @@ const TestContainer = () => {
       } = useContext(AuthContext);
     const [ms, setMs] = useState("");
     const [content, setContent] = useState("");
+    const client = new StompJS.Client();
 
-    const client = new StompJS.Client({
-        brokerURL:  "ws://3.38.20.168:8080/websocket/invest", 
-        connectHeaders: {
-            "Authorization": `Bearer ${user.memberTokenInfo.accessToken}`,
-        },
-        debug: function (str) {
-            console.log(str);
-        },
-    });
+    // const client = new StompJS.Client({
+    //     brokerURL:  WS_SERVER_URL, 
+    //     connectHeaders: {
+    //         "Authorization": `Bearer ${user.memberTokenInfo.accessToken}`,
+    //     },
+    //     debug: function (str) {
+    //         console.log(str);
+    //     },
+    // });
 
     useEffect(() => {
+        client.configure({
+            brokerURL: WS_SERVER_URL, 
+            // webSocketFactory: () => new SockJS("/ws"),
+            connectHeaders: {
+                "Authorization": `Bearer ${user.memberTokenInfo.accessToken}`,
+            },
+            onConnect: (e) => {
+                console.log("onConnect ", e)
+                wsSubscribe();
+            },
+            debug: function (str) {
+                console.log(str);
+            },
+        });
 
+        client.activate();
 
-    client.activate();
-
-        wsSubscribe();
+        
       return () => wsDisconnect();
     }, []);
 
+
+client.onConnect = function (frame) {
+    // Do something, all subscribes must be done is this callback
+    // This is needed because this will be executed after a (re)connect
+    console.log(frame)
+  };
+  
+  client.onStompError = function (frame) {
+    // Will be invoked in case of error encountered at Broker
+    // Bad login/passcode typically will cause an error
+    // Complaint brokers will set `message` header with a brief message. Body may contain details.
+    // Compliant brokers will terminate the connection after any error
+    console.log('Broker reported error: ' + frame.headers['message']);
+    console.log('Additional details: ' + frame.body);
+  };
 
 
 
@@ -99,25 +128,18 @@ const TestContainer = () => {
             ),
         })
     }
-    client.onDisconnect = e => {
-        console.log("client.onDisconnect ::: 001", e)
-
-    }
-    client.onStompError = e => {
-
-        console.log("client.onStompError ::: 001", e)
-    }
-
-    client.onWebSocketError = e => {
-
-        console.log("client.onWebSocketError ::: 001", e)
-    }
 
     const wsSubscribe = () => {
-        console.log("wsSubscribe ::: 001 -- 001");
-        // console.log("[test ::: ] initiateSocketConnection")
+        console.log("[test ::: ] wsSubscribe")
+        console.log("[test ::: ] wsSubscribe")
+        console.log("[test ::: ] wsSubscribe")
+        console.log("[test ::: ] wsSubscribe")
+        console.log("[test ::: ] wsSubscribe")
+        console.log("[test ::: ] wsSubscribe")
         // console.log("[test ::: ] ChatScreen objectStore", objectStore);
         // console.log("[test ::: ] ChatScreen objectChatRoom1", objectChatRoom1);
+       
+        
         var chattingRoomId = objectChatRoom1 ? objectChatRoom1 : '';
         // console.log("[test ::: ] ChatScreen chattingRoomId", chattingRoomId);
         var memberUUID = user && user.uuid ? user.uuid : '';
@@ -129,65 +151,58 @@ const TestContainer = () => {
         var  SUB_REMOVE_MESSAGE = `/topic/chatting/sub/removeMessage/${chattingRoomId}`
         var  SUB_NEW_MEMBERS = `/topic/chatting/sub/admin/newMembers/${chattingRoomId}`
         var  SUB_NEW_INFORM =  `/topic/chatting/sub/newInform/${chattingRoomId}`
-        client.onDisconnect = e => {
-            console.log("client.onDisconnect ::: 001", e)
 
-        }
-        client.onConnect = () => {
-            console.log("client.onConnect ::: 001")
-            // onClick();
-            client.subscribe(`${PUB_NEW_PRIVATE_MESSAGE}`, (msg) => {
-                const newMessage = JSON.parse(msg.body).message;
-                console.log(`SUBSCRIBE -> RECEIVED MSG :: ${PUB_NEW_PRIVATE_MESSAGE}`, newMessage)
-                // setContent(newMessage);
+        client.subscribe(`${PUB_NEW_PRIVATE_MESSAGE}`, (msg) => {
+            console.log('msg', msg)
+            // const newMessage = JSON.parse(msg.body).message;
+            // console.log(`SUBSCRIBE -> RECEIVED MSG :: ${PUB_NEW_PRIVATE_MESSAGE}`, newMessage)
+            // setContent(newMessage);
 
-            }, {id: "user"})
+        }, {id: "user"})
 
-            client.subscribe(`${PUB_NEW_PUBLIC_MESSAGE}`, (msg) => {
-                const newMessage = JSON.parse(msg.body).message;
-                console.log(`SUBSCRIBE -> RECEIVED MSG :: ${PUB_NEW_PUBLIC_MESSAGE}`, newMessage)
-                // setContent(newMessage);
+        client.subscribe(`${PUB_NEW_PUBLIC_MESSAGE}`, (msg) => {
+            const newMessage = JSON.parse(msg.body).message;
+            console.log(`SUBSCRIBE -> RECEIVED MSG :: ${PUB_NEW_PUBLIC_MESSAGE}`, newMessage)
+            // setContent(newMessage);
 
-            }, {id: "user"})
+        }, {id: "user"})
 
-            client.subscribe(`${PUB_DISCONNECT_CHATTING_ROOM}`, (msg) => {
-                const newMessage = JSON.parse(msg.body).message;
-                console.log(`SUBSCRIBE -> RECEIVED MSG :: ${PUB_DISCONNECT_CHATTING_ROOM}`, newMessage)
-                // setContent(newMessage);
+        client.subscribe(`${PUB_DISCONNECT_CHATTING_ROOM}`, (msg) => {
+            const newMessage = JSON.parse(msg.body).message;
+            console.log(`SUBSCRIBE -> RECEIVED MSG :: ${PUB_DISCONNECT_CHATTING_ROOM}`, newMessage)
+            // setContent(newMessage);
 
-            }, {id: "user"})
-            client.subscribe(`${SUB_NEW_MESSAGE}`, (msg) => {
-                const newMessage = JSON.parse(msg.body).message;
-                console.log(`SUBSCRIBE -> RECEIVED MSG :: ${SUB_NEW_MESSAGE}`, newMessage)
-                // setContent(newMessage);
+        }, {id: "user"})
+        client.subscribe(`${SUB_NEW_MESSAGE}`, (msg) => {
+            const newMessage = JSON.parse(msg.body).message;
+            console.log(`SUBSCRIBE -> RECEIVED MSG :: ${SUB_NEW_MESSAGE}`, newMessage)
+            // setContent(newMessage);
 
-            }, {id: "user"})
-            client.subscribe(`${SUB_NEW_MESSAGE_TO_ME}`, (msg) => {
-                const newMessage = JSON.parse(msg.body).message;
-                console.log(`SUBSCRIBE -> RECEIVED MSG :: ${SUB_NEW_MESSAGE_TO_ME}`, newMessage)
-                // setContent(newMessage);
+        }, {id: "user"})
+        client.subscribe(`${SUB_NEW_MESSAGE_TO_ME}`, (msg) => {
+            const newMessage = JSON.parse(msg.body).message;
+            console.log(`SUBSCRIBE -> RECEIVED MSG :: ${SUB_NEW_MESSAGE_TO_ME}`, newMessage)
+            // setContent(newMessage);
 
-            }, {id: "user"})
-            client.subscribe(`${SUB_REMOVE_MESSAGE}`, (msg) => {
-                const newMessage = JSON.parse(msg.body).message;
-                console.log(`SUBSCRIBE -> RECEIVED MSG :: ${SUB_REMOVE_MESSAGE}`, newMessage)
-                // setContent(newMessage);
+        }, {id: "user"})
+        client.subscribe(`${SUB_REMOVE_MESSAGE}`, (msg) => {
+            const newMessage = JSON.parse(msg.body).message;
+            console.log(`SUBSCRIBE -> RECEIVED MSG :: ${SUB_REMOVE_MESSAGE}`, newMessage)
+            // setContent(newMessage);
 
-            }, {id: "user"})
-            client.subscribe(`${SUB_NEW_MEMBERS}`, (msg) => {
-                const newMessage = JSON.parse(msg.body).message;
-                console.log(`SUBSCRIBE -> RECEIVED MSG :: ${SUB_NEW_MEMBERS}`, newMessage)
-                // setContent(newMessage);
+        }, {id: "user"})
+        client.subscribe(`${SUB_NEW_MEMBERS}`, (msg) => {
+            const newMessage = JSON.parse(msg.body).message;
+            console.log(`SUBSCRIBE -> RECEIVED MSG :: ${SUB_NEW_MEMBERS}`, newMessage)
+            // setContent(newMessage);
 
-            }, {id: "user"})
-            client.subscribe(`${SUB_NEW_INFORM}`, (msg) => {
-                const newMessage = JSON.parse(msg.body).message;
-                console.log(`SUBSCRIBE -> RECEIVED MSG :: ${SUB_NEW_INFORM}`, newMessage)
-                // setContent(newMessage);
+        }, {id: "user"})
+        client.subscribe(`${SUB_NEW_INFORM}`, (msg) => {
+            const newMessage = JSON.parse(msg.body).message;
+            console.log(`SUBSCRIBE -> RECEIVED MSG :: ${SUB_NEW_INFORM}`, newMessage)
+            // setContent(newMessage);
 
-            }, {id: "user"})
-            
-        }
+        }, {id: "user"})
     }
 
     const wsDisconnect = () => {

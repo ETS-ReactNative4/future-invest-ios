@@ -7,7 +7,8 @@ import {
   Platform,
   StyleSheet,
   ScrollView,
-  Modal
+  Modal,
+  KeyboardAvoidingView
 } from 'react-native';
 import FormInput from '../components/FormInput';
 import FormButton from '../components/FormButton';
@@ -161,7 +162,10 @@ FutureInvestApi.updateFcmToken(req)
 
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView contentContainerStyle={styles.container} style={{
+      backgroundColor: '#fceb39',
+      }}>
+        
       {
         boolPermissionPopup && 
         <Modal 
@@ -237,6 +241,8 @@ FutureInvestApi.updateFcmToken(req)
         </Modal>
 
       }
+
+      <KeyboardAvoidingView style={{ width: windowWidth - 40, display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
       <Text style={styles.text1}>VIP 리딩</Text>
       <Text style={styles.text2}>Hello!</Text>
 
@@ -321,6 +327,7 @@ FutureInvestApi.updateFcmToken(req)
           회원가입
         </Text>
       </TouchableOpacity>
+      </KeyboardAvoidingView>
     </ScrollView>
   );
 };

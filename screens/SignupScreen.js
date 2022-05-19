@@ -1,5 +1,5 @@
 import React, {useContext, useState, useEffect} from 'react';
-import {View, Text, TouchableOpacity, Platform, StyleSheet, Dimensions, Image} from 'react-native';
+import { Alert, KeyboardAvoidingView, View, Text, TouchableOpacity, Platform, StyleSheet, Dimensions, Image} from 'react-native';
 import FormInput from '../components/FormInput2';
 import FormInputWithDuplCheck from  '../components/FormInputWithDuplCheck';
 import FormInputPhoneSelect from  '../components/FormInputPhoneSelect';
@@ -12,9 +12,11 @@ import DeviceInfo from 'react-native-device-info';
 import * as BaseApi from "../api/BaseApi";
 import * as FutureInvestApi from "../api/FutureInvestApi";
 import { ScrollView } from 'react-native-gesture-handler';
+import { windowWidth, windowHeight } from '../utils/Dimentions';
 
 const device_width = Dimensions.get('window').width;
 const device_height = Dimensions.get('window').height;
+
 
 const SignupScreen = ({navigation}) => {
   const [id, setId] = useState("");
@@ -131,6 +133,29 @@ const SignupScreen = ({navigation}) => {
         if (res.data == false) {
           console.log("=== false")
           setIdError("");
+          Alert.alert(
+            "확인",
+            "사용가능합니다.",
+            [
+              // {
+              //   text: "Ask me later",
+              //   onPress: () => console.log("Ask me later pressed")
+              // },
+              // {
+              //   text: "Cancel",
+              //   onPress: () => console.log("Cancel Pressed"),
+              //   style: "cancel"
+              // },
+              { text: "OK", onPress: () => {console.log("OK Pressed")} }
+            ],
+            {
+              cancelable: true,
+              onDismiss: () => {
+                console.log("OK onDismiss")
+              }
+            }
+          );
+
         } else {
           console.log("!== false")
           setIdError("사용할 수 없습니다");
@@ -158,6 +183,29 @@ const SignupScreen = ({navigation}) => {
       if (res.status < 300) {
         if (res.data == false) {
           setTextNicknameError("");
+          Alert.alert(
+            "확인",
+            "사용가능합니다.",
+            [
+              // {
+              //   text: "Ask me later",
+              //   onPress: () => console.log("Ask me later pressed")
+              // },
+              // {
+              //   text: "Cancel",
+              //   onPress: () => console.log("Cancel Pressed"),
+              //   style: "cancel"
+              // },
+              { text: "OK", onPress: () => {console.log("OK Pressed")} }
+            ],
+            {
+              cancelable: true,
+              onDismiss: () => {
+                console.log("OK onDismiss")
+              }
+            }
+          );
+
         } else {
           setTextNicknameError("사용할 수 없습니다");
         }
@@ -189,6 +237,30 @@ const SignupScreen = ({navigation}) => {
       if (res.status < 300) {
         if (res.data == false) {
           setTextPhone1Error("");
+          Alert.alert(
+            "확인",
+            "사용가능합니다.",
+            [
+              // {
+              //   text: "Ask me later",
+              //   onPress: () => console.log("Ask me later pressed")
+              // },
+              // {
+              //   text: "Cancel",
+              //   onPress: () => console.log("Cancel Pressed"),
+              //   style: "cancel"
+              // },
+              { text: "OK", onPress: () => {console.log("OK Pressed")} }
+            ],
+            {
+              cancelable: true,
+              onDismiss: () => {
+                console.log("OK onDismiss")
+              }
+            }
+          );
+
+          
         } else {
           setTextPhone1Error("사용할 수 없습니다");
         }
@@ -273,12 +345,25 @@ const SignupScreen = ({navigation}) => {
 
 
   return (
+
+<KeyboardAvoidingView style={{ flex: 1, flexDirection: 'column',justifyContent: 'center',}} behavior="padding" enabled   keyboardVerticalOffset={100}
+>
+
     <ScrollView style={styles.scrollview}>
-    <View style={styles.container}>
+
+<View style={styles.container}>
       <FormInputWithDuplCheck
         labelText={'아이디'}
         labelValue={id}
-        onChangeText={(id) => setId(id)}
+        onChangeText={(id) => {
+          
+          if (id.length > 9) {
+
+          } else {
+
+            setId(id)
+          }
+        }}
         placeholderText="4자 이상 9자 이하"
         iconType="user"
         // keyboardType="email-address"
@@ -291,7 +376,16 @@ const SignupScreen = ({navigation}) => {
       <FormInputWithDuplCheck
         labelText={'닉네임'}
         labelValue={textNickname}
-        onChangeText={(textNickname) => setTextNickname(textNickname)}
+        onChangeText={(textNickname) => 
+          {
+
+          if (textNickname.length > 9) {
+
+          } else {
+            setTextNickname(textNickname)
+          }
+          
+          }}
         placeholderText="9자 이하"
         secureTextEntry={false}
         autoCapitalize="none"
@@ -380,10 +474,32 @@ const SignupScreen = ({navigation}) => {
         </View>
       ) : null}
 
+      <View style={{ width: windowWidth, height: 100 }}></View>
+
       <TouchableOpacity
         style={boolPossibleSubmit == true ? styles.navButtonActive : styles.navButton}
         onPress={() => {
           // navigation.navigate('Login')
+          
+          if (textPassword >=4 && textPassword < 9) {
+            setTextPasswordError("비밀번호는 4자이상 8자이하입니다.")
+            return;
+          } else {
+            setTextPasswordError("")
+          }
+          if (textPassword != confirmPassword) {
+            setConfirmPasswordError("비밀번호가 같지 않습니다.")
+            return;
+          } 
+
+          if (confirmPassword >=4 && confirmPassword < 9) {
+            setConfirmPasswordError("비밀번호는 4자이상 8자이하입니다.")
+            return;
+          } else {
+            setConfirmPasswordError("")
+          }
+
+          
           __apiPostRegister();
         }}
         >
@@ -393,6 +509,7 @@ const SignupScreen = ({navigation}) => {
       </TouchableOpacity>
     </View>
     </ScrollView>
+  </KeyboardAvoidingView>
   );
 };
 

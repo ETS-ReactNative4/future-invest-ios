@@ -5,6 +5,7 @@
 // }
 export const  SERVER_URL = "http://3.38.20.168:8080/" // aws ec2 instance
 export const WS_SERVER_URL = "ws://3.38.20.168:8080/websocket/invest"
+// export const WS_SERVER_URL = "ws://3.38.20.168:8080/websocket/invest"
 //    const val SERVER_URL = "http://172.31.98.147:8080/" // my local
 //    const val WS_SERVER_URL = "ws://172.31.98.147:8080/websocket/invest"
 // api 실패 시 재시도 텀
