@@ -201,3 +201,13 @@ Use https://github.com/DylanVann/react-native-fast-image
 https://developer.apple.com/forums/thread/92638
 
 https://github.com/oblador/react-native-vector-icons/issues/1074
+
+
+
+https://velog.io/@tlatldms/Socket-인증-with-API-Gateway-Refresh-JWT
+
+https://websockets.readthedocs.io/en/latest/topics/authentication.html
+
+https://driip.me/d24af1eb-c5bd-49a9-a9dc-18446274ace5
+https://tjdans.tistory.com/25
+https://stackoverflow.com/questions/37246446/sending-cookies-with-react-native-websockets/37251989#37251989

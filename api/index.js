@@ -3,8 +3,8 @@
 // const notification_chatting_room_notify_id: (toInt: Int?) -> Int = {
 //     100000 + (it ?: -1)
 // }
-export const  SERVER_URL = "http://3.38.20.168:8080/" // aws ec2 instance
-export const WS_SERVER_URL = "ws://3.38.20.168:8080/websocket/invest"
+export const SERVER_URL = "http://3.38.20.168:8080/" // aws ec2 instance
+export const WS_SERVER_URL = "ws://172.31.98.151/websocket/invest"
 // export const WS_SERVER_URL = "ws://3.38.20.168:8080/websocket/invest"
 //    const val SERVER_URL = "http://172.31.98.147:8080/" // my local
 //    const val WS_SERVER_URL = "ws://172.31.98.147:8080/websocket/invest"
